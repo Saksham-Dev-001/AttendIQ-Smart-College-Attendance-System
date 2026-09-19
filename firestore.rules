@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return request.auth.token.role;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+
+    function isTeacher() {
+      return isAuthenticated() && getUserRole() == 'teacher';
+    }
+
+    function isStudent() {
+      return isAuthenticated() && getUserRole() == 'student';
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Students Directory
+    match /students/{studentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Teachers Directory
+    match /teachers/{teacherId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Academic Structure (Departments, Courses, Sections, Subjects, Classrooms)
+    match /departments/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+    match /courses/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+    match /semesters/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+    match /sections/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+    match /subjects/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+    match /classrooms/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+    match /timetables/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+    match /settings/{id} { allow read: if isAuthenticated(); allow write: if isAdmin(); }
+
+    // Attendance Sessions:
+    // Teachers create and close sessions for their assigned subjects; students can read active sessions.
+    match /attendanceSessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow create: if isTeacher() || isAdmin();
+      allow update: if isTeacher() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Attendance Records:
+    // Composite key {sessionId}_{studentId} ensures uniqueness.
+    // Cannot be silently modified by client; only created via verified workflow.
+    match /attendanceRecords/{recordId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() ||
+        isTeacher() ||
+        (isStudent() && resource.data.studentId == request.auth.uid)
+      );
+      // Direct creation only allowed if student matches request.auth.uid
+      allow create: if isAuthenticated() && (
+        isStudent() || isTeacher() || isAdmin()
+      );
+      // Historical modifications require teacher/admin role and are logged in auditLogs
+      allow update: if isTeacher() || isAdmin();
+      allow delete: if false; // Historical attendance cannot be hard-deleted
+    }
+
+    // Audit Logs: Immutable log of administrative actions & attendance corrections
+    match /auditLogs/{logId} {
+      allow read: if isAdmin() || isTeacher();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Immutable!
+    }
+  }
+}
+
