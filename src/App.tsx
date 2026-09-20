@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { LoginPage } from './pages/auth/LoginPage';
 
 // Admin Pages
@@ -132,13 +133,13 @@ export function App() {
       <div className="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row">
         <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab} />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 overflow-y-auto">
           {renderContent()}
 
-          {/* Footer with Reset Database helper */}
+          {/* Institutional Status & Maintenance Footer */}
           <footer className="mt-12 pt-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
             <div>
-              AttendIQ • Smart College Attendance System © 2026. All verification checks enforced server-side.
+              AttendIQ • Sri Balaji College of Engineering & Technology © 2026. Enforced with Geofence & Biometrics.
             </div>
             <button
               onClick={() => {
@@ -155,6 +156,9 @@ export function App() {
           </footer>
         </main>
       </div>
+
+      {/* Touch-optimized Mobile Bottom Navigation */}
+      <MobileBottomNav currentTab={currentTab} onSelectTab={setCurrentTab} />
     </div>
   );
 }
