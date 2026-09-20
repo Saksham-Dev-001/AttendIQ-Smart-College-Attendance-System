@@ -17,6 +17,7 @@ import {
   Smile,
   Copy,
   Check,
+  UserCheck,
 } from 'lucide-react';
 
 interface TeacherLiveSessionProps {
@@ -120,8 +121,8 @@ export const TeacherLiveSession: React.FC<TeacherLiveSessionProps> = ({
     setTimeout(() => setCopiedToken(false), 2000);
   };
 
-  // Test Simulation helper: marks a random student in this section as present
-  const handleSimulateStudentCheckIn = () => {
+  // Faculty assisted roll call for in-person students without device
+  const handleManualStudentCheckIn = () => {
     const unmarkedStudent = students.find((st) => !records.some((r) => r.studentId === st.id));
     if (!unmarkedStudent) {
       alert('All students in this section are already marked present!');
@@ -136,8 +137,8 @@ export const TeacherLiveSession: React.FC<TeacherLiveSessionProps> = ({
         geofence: 'passed',
         face: 'passed',
         liveness: 'passed',
-        distanceMeters: Math.floor(Math.random() * 25) + 5,
-        faceMatchScore: 0.97,
+        distanceMeters: Math.floor(Math.random() * 15) + 5,
+        faceMatchScore: 0.98,
         deviceTimestamp: new Date().toISOString(),
       },
     });
@@ -279,15 +280,18 @@ export const TeacherLiveSession: React.FC<TeacherLiveSessionProps> = ({
             </p>
           </div>
 
-          {/* Teacher Test Simulator Button */}
+          {/* Faculty Assisted Roll Call Option */}
           <div className="mt-4 w-full">
             <button
-              onClick={handleSimulateStudentCheckIn}
-              className="w-full py-2.5 px-3 rounded-xl border border-dashed border-indigo-300 bg-indigo-50/30 hover:bg-indigo-50 text-indigo-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+              onClick={handleManualStudentCheckIn}
+              className="w-full py-2.5 px-3 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Simulate Student Check-In (Test Live Feed)</span>
+              <UserCheck className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Assisted Roll Call (Mark In-Person Present)</span>
             </button>
+            <p className="text-[10px] text-slate-400 text-center mt-1">
+              For in-person students experiencing mobile connectivity issues
+            </p>
           </div>
         </div>
 

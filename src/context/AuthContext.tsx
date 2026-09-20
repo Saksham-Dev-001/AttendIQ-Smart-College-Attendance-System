@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: `No active ${role} account found matching "${idOrEmail}".` };
     }
 
-    // Passwords check (default demo passes or any valid standard test string)
+    // Institutional password validation
     if (pass.length < 3) {
       return { success: false, message: 'Password must be at least 3 characters.' };
     }

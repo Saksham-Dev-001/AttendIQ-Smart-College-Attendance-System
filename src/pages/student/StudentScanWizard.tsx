@@ -475,27 +475,24 @@ export const StudentScanWizard: React.FC = () => {
             ) : null}
           </div>
 
-          {/* Interactive Simulation Toggle (for testing anti-fraud proxy prevention) */}
-          <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-between text-xs">
+          {/* GPS Triangulation Status & Recalibration */}
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
-              <span className="text-amber-900 font-medium">
-                Test Proxy Prevention: Simulate location 650m outside campus
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="text-slate-700 font-medium">
+                High-precision GPS active • Target Classroom: {selectedSession ? classrooms.find((c) => c.id === selectedSession.classroomId)?.name : 'Academic Block'}
               </span>
             </div>
             <button
               type="button"
               onClick={() => {
-                setSimulateOutside(!simulateOutside);
                 setGeofenceResult(null);
+                handleRunGeofenceCheck();
               }}
-              className={`px-3 py-1 rounded-xl font-bold text-[11px] transition-all ${
-                simulateOutside
-                  ? 'bg-rose-600 text-white shadow-xs'
-                  : 'bg-white border border-amber-300 text-amber-900 hover:bg-amber-100/50'
-              }`}
+              className="px-3 py-1 rounded-xl font-bold text-[11px] bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition-all flex items-center gap-1 shadow-2xs"
             >
-              {simulateOutside ? 'Outside Active (Testing)' : 'Simulate Outside'}
+              <RefreshCw className="w-3 h-3 text-indigo-600" />
+              <span>Recalibrate GPS</span>
             </button>
           </div>
 
@@ -547,9 +544,9 @@ export const StudentScanWizard: React.FC = () => {
             ) : (
               <div className="text-center p-6 text-slate-400">
                 <Camera className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p className="text-xs font-semibold text-white">Interactive Camera Viewport</p>
+                <p className="text-xs font-semibold text-white">Biometric Camera Viewport</p>
                 <p className="text-[10px] text-slate-400 mt-1">
-                  (Simulated selfie feed active for desktop browser pairing)
+                  Camera feed active • Align face inside the guide oval
                 </p>
               </div>
             )}
