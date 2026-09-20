@@ -1,12 +1,26 @@
 import { AttendanceRecord, Subject } from '../types';
 
+/**
+ * Sanitizes a string for CSV export to prevent CSV formula injection (CWE-1236)
+ * and properly escape internal double quotes.
+ */
+function sanitizeCsvCell(value: any): string {
+  if (value === null || value === undefined) return '""';
+  let str = String(value).trim();
+  // If the cell begins with dangerous formula trigger characters, prefix with single quote
+  if (/^[=+\-@\t\r]/.test(str)) {
+    str = `'${str}`;
+  }
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
 export function exportAttendanceToCSV(
   records: AttendanceRecord[],
   subjects: Subject[],
-  filename = 'AttendIQ_Attendance_Report.csv'
+  filename = 'AttendIQ_SBCET_Attendance_Report.csv'
 ) {
   if (!records || records.length === 0) {
-    alert('No attendance records to export.');
+    alert('No attendance records available to export.');
     return;
   }
 
@@ -28,23 +42,22 @@ export function exportAttendanceToCSV(
     'Liveness Check',
   ];
 
-  // Optional lookup for student metadata if available
   const rows = records.map((r) => [
-    `"${r.rollNo}"`,
-    `"${r.studentName}"`,
-    `"${(r as any).branch || 'CSE'}"`,
-    `"${(r as any).batch || 'A1'}"`,
-    `"${subjectMap.get(r.subjectId) || r.subjectId}"`,
-    `"${r.status.toUpperCase()}"`,
-    `"${new Date(r.markedAt).toLocaleString()}"`,
-    `"${r.verification.qr}"`,
-    `"${r.verification.geofence}"`,
-    `"${r.verification.distanceMeters ?? 'N/A'}"`,
-    `"${r.verification.face}"`,
-    `"${r.verification.liveness}"`,
+    sanitizeCsvCell(r.rollNo),
+    sanitizeCsvCell(r.studentName),
+    sanitizeCsvCell(r.branch || 'CSE'),
+    sanitizeCsvCell(r.batch || 'A1'),
+    sanitizeCsvCell(subjectMap.get(r.subjectId) || r.subjectId),
+    sanitizeCsvCell(r.status.toUpperCase()),
+    sanitizeCsvCell(new Date(r.markedAt).toLocaleString()),
+    sanitizeCsvCell(r.verification.qr),
+    sanitizeCsvCell(r.verification.geofence),
+    sanitizeCsvCell(r.verification.distanceMeters ?? 'N/A'),
+    sanitizeCsvCell(r.verification.face),
+    sanitizeCsvCell(r.verification.liveness),
   ]);
 
-  const csvContent = [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+  const csvContent = [headers.map(h => sanitizeCsvCell(h)).join(','), ...rows.map((e) => e.join(','))].join('\r\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -53,5 +66,6 @@ export function exportAttendanceToCSV(
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  // Prevent memory leak
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-

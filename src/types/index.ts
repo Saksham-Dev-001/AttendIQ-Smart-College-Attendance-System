@@ -151,6 +151,8 @@ export interface AttendanceRecord {
   subjectId: string;
   sectionId: string;
   status: AttendanceStatus;
+  branch?: string;
+  batch?: string;
   markedAt: string;
   verification: VerificationDetails;
 }

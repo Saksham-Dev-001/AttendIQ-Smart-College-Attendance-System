@@ -416,11 +416,11 @@ export const StudentScanWizard: React.FC = () => {
             <div className="flex gap-2">
               <input
                 type="text"
-                maxLength={6}
+                maxLength={100}
                 value={qrInputToken}
-                onChange={(e) => setQrInputToken(e.target.value.toUpperCase())}
-                placeholder="e.g. 7A9K2M"
-                className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-base tracking-widest text-center text-slate-900 font-bold uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+                onChange={(e) => setQrInputToken(e.target.value)}
+                placeholder="Enter live QR code or select session above"
+                className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm tracking-wider text-center text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
               />
               <button
                 type="button"

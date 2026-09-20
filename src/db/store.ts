@@ -407,6 +407,8 @@ class DatabaseStore {
       subjectId: session.subjectId,
       sectionId: session.sectionId,
       status,
+      branch: student.branch,
+      batch: student.batch,
       markedAt: new Date().toISOString(),
       verification: params.verification,
     };
