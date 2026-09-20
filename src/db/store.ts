@@ -72,7 +72,7 @@ class DatabaseStore {
     this.auditLogs = this.load('attendiq_audit_logs', INITIAL_AUDIT_LOGS);
 
     // Auto-migrate if previous cache is outdated or doesn't have the full 114 SBCET students
-    const CURRENT_DATA_VERSION = '2026_sbcet_v3_114_students';
+    const CURRENT_DATA_VERSION = '2026_sbcet_v4_production';
     const cachedVersion = localStorage.getItem('attendiq_data_version');
     if (
       cachedVersion !== CURRENT_DATA_VERSION ||
@@ -466,7 +466,7 @@ class DatabaseStore {
     this.save('attendiq_audit_logs', this.auditLogs);
   }
 
-  // Reset demo data
+  // Reset to SBCET institutional defaults
   resetToDefaults() {
     localStorage.clear();
     this.settings = INITIAL_SETTINGS;
@@ -499,7 +499,7 @@ class DatabaseStore {
     this.save('attendiq_attendance_records', this.attendanceRecords);
     this.save('attendiq_audit_logs', this.auditLogs);
     try {
-      localStorage.setItem('attendiq_data_version', '2026_sbcet_v3_114_students');
+      localStorage.setItem('attendiq_data_version', '2026_sbcet_v4_production');
     } catch {}
 
     this.notify();

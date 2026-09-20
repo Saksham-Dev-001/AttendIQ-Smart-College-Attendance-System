@@ -21,7 +21,7 @@
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
-- [Demo Credentials](#-demo-credentials)
+- [Institutional Portal Access](#-institutional-portal-access)
 - [Architecture](#-architecture)
 - [Deployment](#-deployment)
 - [Firebase Integration](#-firebase-integration)
@@ -172,15 +172,17 @@ npm run preview
 
 ---
 
-## 🔑 Demo Credentials
+## 🔑 Institutional Portal Access
 
-| Portal | ID | Password | Details |
-|--------|-----|----------|---------|
-| **👨🎓 Student** | `BCA2026001` | `student123` | Rahul Verma (BCA, Semester 1, Section A) |
-| **👨🏫 Teacher** | `EMP-T101` | `teacher123` | Dr. Rajesh Kumar (Computer Science) |
-| **🛡️ Admin** | `admin@college.edu` | `admin123` | Dr. A. K. Banerjee (Registrar) |
+| Portal | Identifier / Username | Password | User Details & Branch |
+|--------|----------------------|----------|-----------------------|
+| **👨‍🎓 Student (Section A)** | `26SBCETCSE001` | `student123` | Aayush Sharma (B.Tech I Sem • CSE, Batch A1) |
+| **👨‍🎓 Student (Section B)** | `26SBCETAI001` | `student123` | Akash Babu (B.Tech I Sem • AI, Batch B1) |
+| **👨‍🏫 Faculty (Chemistry)** | `EMP-T201` or `aastha@sbcet.ac.in` | `teacher123` | Dr. Aastha Pareek (Faculty of Chemistry) |
+| **👨‍🏫 Faculty (Mathematics)** | `EMP-T202` or `ahkhan@sbcet.ac.in` | `teacher123` | Dr. A. H. Khan (Faculty of Mathematics) |
+| **🛡️ Administrator** | `admin@sbcet.ac.in` | `admin123` | Dr. Surendra Singh (Principal & Registrar) |
 
-> 💡 Use the **Quick Switch** pill in the top navigation to instantly switch between roles.
+> ℹ️ *All 114 enrolled students and 11 department faculty members can authenticate directly using their official Roll Number or Employee ID.*
 
 ---
 
@@ -192,21 +194,21 @@ Teacher starts session → Dynamic QR generated (25s rotation)
         ↓
 Student scans QR → Token validated
         ↓
-Geofence check → Must be within campus radius
+Geofence check → Must be within campus radius (Haversine formula)
         ↓
-Face verification + Liveness detection → Anti-spoofing
+Face verification + Liveness detection → Interactive challenge
         ↓
 Attendance recorded → Immutable audit log created
 ```
 
 ### Data Store
-- **Default**: LocalStorage-based store with auto-migration and version control
+- **Default**: LocalStorage-based store with automatic version migration (`2026_sbcet_v4_production`)
 - **Production**: Firebase Firestore with role-based security rules
 
-### Pre-loaded Data
-- **114 students** across 6 branches (CSE, ECE, ME, CE, EE, BCA)
-- **SBCET College** timetable for B.Tech 1st Year, 1st Semester
-- Branch-wise faculty assignments
+### Pre-loaded Institutional Data
+- **114 Real Students** enrolled across Section A (CSE, CS) and Section B (AI, CSE-DS, Mech)
+- **11 Faculty Members** from First Year Engineering & Applied Sciences
+- **Full Timetable** for B.Tech 1st Year, 1st Semester (SL1, SL-4, Labs)
 
 ---
 

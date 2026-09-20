@@ -142,7 +142,7 @@ export function App() {
             </div>
             <button
               onClick={() => {
-                if (window.confirm('Reset all demo data back to factory defaults?')) {
+                if (window.confirm('Restore SBCET college database to initial academic term defaults?')) {
                   db.resetToDefaults();
                   window.location.reload();
                 }
@@ -150,7 +150,7 @@ export function App() {
               className="text-slate-400 hover:text-slate-700 flex items-center gap-1 text-[11px]"
             >
               <RotateCcw className="w-3 h-3" />
-              <span>Reset Demo Database</span>
+              <span>Restore College Defaults</span>
             </button>
           </footer>
         </main>
