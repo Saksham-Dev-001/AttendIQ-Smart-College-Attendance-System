@@ -262,5 +262,5 @@ This project is developed for educational purposes at **SBCET College**.
 ---
 
 <p align="center">
-  Made with ❤️ by <a href="https://github.com/Saksham-Dev-001">Saksham Dev</a>
+  <a href="https://github.com/Saksham-Dev-001">Saksham Sharma</a>
 </p>
