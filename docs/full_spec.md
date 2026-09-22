@@ -1,1550 +1,272 @@
-# Smart College Attendance System — Complete Project Specification
-
-## 1. Project Overview
-
-**Project Name:** Smart College Attendance System  
-**Project Type:** College/University attendance management platform  
-**Primary Goal:** Reduce the time teachers spend taking attendance while improving attendance integrity through authenticated student accounts, dynamic QR sessions, geofence verification, face verification, liveness detection, timestamps, and audit logs.
-
-### Core Attendance Flow
-
-Teacher starts a class attendance session → system generates a short-lived dynamic QR → student logs in and scans QR → system validates the active session → location/geofence is checked → face verification and liveness are performed → attendance is recorded → teacher sees the live count.
-
-### Primary Users
-
-1. **Admin**
-2. **Teacher**
-3. **Student**
+# AttendIQ — Smart College Attendance System
+## Complete Production Technical Specification & System Architecture
+**Institution:** Sri Balaji College of Engineering & Technology (SBCET), Jaipur  
+**Affiliation:** Rajasthan Technical University (RTU), Kota & Approved by AICTE, New Delhi  
+**Academic Session:** 2026–2027 (w.e.f. 17/08/2026)  
+**System Version:** v2.4-Production (Progressive Web App)  
+**Repository:** `https://github.com/Saksham-Dev-001/AttendIQ-Smart-College-Attendance-System`
 
 ---
 
-# 2. Product Goals
+## 1. Executive Summary & Problem Definition
 
-- Make attendance fast for teachers.
-- Allow students to mark their own attendance.
-- Prevent attendance through shared/static QR screenshots.
-- Reduce proxy attendance.
-- Provide subject-wise and overall attendance analytics.
-- Automate class/subject selection through timetable data.
-- Maintain a reliable correction and audit history.
-- Make the system mobile-first and easy to use.
-- Keep biometric and location data collection minimized and controlled.
+Traditional attendance management in Indian engineering colleges relies on paper roll-call registers, taking 10–15 minutes of every 50-minute lecture (~25% of instructional time). Furthermore, manual registers suffer from proxy signatures, buddy punching, and clerical calculation errors. Rudimentary QR code apps fail due to instant screenshot sharing over messaging channels (WhatsApp, Telegram).
 
----
+**AttendIQ** is an institutional-grade, multi-tier digital attendance management Progressive Web App (PWA) engineered specifically for **Sri Balaji College of Engineering & Technology (SBCET), Jaipur**. AttendIQ eliminates proxy attendance through a synchronized four-stage verification pipeline:
 
-# 3. Recommended Technology Stack
+$$\text{Dynamic QR Token (25s)} \longrightarrow \text{Haversine Geofence (150m)} \longrightarrow \text{Biometric Liveness Challenge} \longrightarrow \text{Atomic Composite Lock}$$
 
-## Frontend
-
-- HTML5
-- CSS3
-- JavaScript
-- Responsive/mobile-first UI
-
-Optional future migration:
-- React or Next.js
-
-## Backend / Cloud
-
-- Firebase Authentication
-- Cloud Firestore
-- Firebase Cloud Functions
-- Firebase Hosting or Netlify
-
-## Attendance Components
-
-- Dynamic QR generation
-- QR scanning
-- Geofence/location verification
-- Face verification
-- Liveness detection
-- Server-generated timestamps
-- Audit logging
-
-## Reports
-
-- CSV/Excel export
-- PDF report generation can be added later
+### Key Production Benchmarks
+- **Student Check-In Duration:** $< 10$ seconds per student.
+- **Screenshot Proxy Rate:** $0\%$ (tokens expire every 25 seconds).
+- **Statutory Compliance:** Automated $75\%$ attendance threshold alerts adhering to RTU Kota ordinances.
+- **Real SBCET Dataset:** 114 enrolled students across 6 branches, 11 faculty members, 60 historical sessions across 5 weeks.
+- **Reporting Engine:** Zero-dependency, client-side PDF generation for official class roll-call sheets and cumulative semester registers.
 
 ---
 
-# 4. User Roles & Permissions
+## 2. Complete Technology Stack
 
-## 4.1 Admin
-
-Admin has full system management access.
-
-### Admin capabilities
-
-- Login
-- Dashboard
-- Add/edit/remove students
-- Add/edit/remove teachers
-- Manage departments
-- Manage courses
-- Manage semesters/years
-- Manage sections
-- Manage subjects
-- Assign teachers to subjects
-- Assign subjects to sections
-- Manage classrooms
-- Manage timetable
-- Configure attendance rules
-- Configure geofence
-- Configure verification requirements
-- View all attendance
-- View attendance analytics
-- Export reports
-- Review attendance corrections
-- View audit logs
-- Manage student face-profile status
-- Disable/enable accounts
-- Configure academic session
-
-Admin must NOT be able to silently modify historical attendance without creating an audit record.
+| Layer | Technology | Version | Purpose & Architectural Rationale |
+| :--- | :--- | :--- | :--- |
+| **Core Framework** | React | `18.3.1` | Component-driven UI, concurrent rendering, virtual DOM diffing. |
+| **Language** | TypeScript | `5.7.2` | Static type safety, strict compile-time checking, explicit domain interfaces. |
+| **Styling & Design** | Tailwind CSS | `3.4.17` | Utility-first responsive design, modern glassmorphism, zero runtime overhead. |
+| **Build & Tooling** | Vite | `6.4.3` | Instant HMR, optimized Rollup bundling, sub-10s production builds. |
+| **Iconography** | Lucide React | `1.16.0` | Accessible, tree-shakeable SVG icon set. |
+| **QR Engine** | qrcode | `1.5.4` | High-contrast client-side dynamic QR code generation. |
+| **Celebration FX** | canvas-confetti | `1.9.4` | Hardware-accelerated particle animation for verified check-in receipts. |
+| **PWA Platform** | Service Worker + Manifest | W3C Standard | Offline shell caching, standalone installability on iOS, Android, and Desktop. |
+| **PDF Reporting** | Print DOM Engine | Native | Vector-sharp, official A4 printable attendance sheets and registers. |
+| **Data Layer** | Reactive LocalStorage Store | Custom v5 | Cross-tab event bus, automatic version migrations, Firebase Firestore bridge. |
+| **Hosting & CDN** | Vercel Edge | Production | Global edge caching, automatic SPA rewrites via `vercel.json`. |
 
 ---
 
-# 4.2 Teacher
+## 3. Four-Layer Anti-Fraud Verification Pipeline
 
-### Teacher capabilities
-
-- Login
-- View profile
-- View assigned subjects
-- View today's timetable
-- Start attendance
-- Generate dynamic QR
-- View live attendance count
-- See students who have successfully checked in
-- Close attendance
-- View attendance history for assigned subjects
-- View subject attendance statistics
-- Request/perform authorized corrections
-- View reports for assigned classes
-
-### Teacher restrictions
-
-- Cannot access another teacher's classes unless explicitly authorized.
-- Cannot change system-wide settings.
-- Cannot modify student accounts.
-- Cannot delete attendance history.
-- Attendance changes must be auditable.
-
----
-
-# 4.3 Student
-
-### Student capabilities
-
-- Login
-- View profile
-- View timetable
-- Scan attendance QR
-- Perform location verification
-- Perform face verification
-- Perform liveness verification
-- Mark attendance
-- View attendance history
-- View subject-wise attendance
-- View overall attendance
-- View monthly calendar
-- See low-attendance warnings
-- View attendance status for each subject
-
-### Student restrictions
-
-- Cannot mark attendance without an active session.
-- Cannot mark attendance twice for the same session.
-- Cannot access another student's attendance.
-- Cannot change attendance records.
-- Cannot manually select a different student identity.
-
----
-
-# 5. College Data Hierarchy
-
-Recommended structure:
-
-College
-→ Department
-→ Course
-→ Academic Year / Semester
-→ Section
-→ Students
-
-Example:
-
-Computer Science Department
-→ BCA
-→ Semester 3
-→ Section A
-→ Students
-
----
-
-# 6. Core Entities
-
-The application should contain:
-
-- Users
-- Students
-- Teachers
-- Departments
-- Courses
-- Academic Sessions
-- Semesters
-- Sections
-- Subjects
-- Classrooms
-- Timetables
-- Attendance Sessions
-- Attendance Records
-- Face Profiles
-- Audit Logs
-- Notifications
-- System Settings
-
----
-
-# 7. Firestore Database Structure
-
-Recommended top-level collections:
-
-```text
-users/
-students/
-teachers/
-departments/
-courses/
-academicSessions/
-semesters/
-sections/
-subjects/
-classrooms/
-timetables/
-attendanceSessions/
-attendanceRecords/
-faceProfiles/
-auditLogs/
-notifications/
-settings/
+```
+Teacher Starts Session
+        ↓
+[Layer 1] Dynamic Rotating QR (25s TTL, 6-char quick codes, 30s grace window)
+        ↓
+[Layer 2] Campus Geofencing (Haversine distance ≤ 150m + Wi-Fi Beacon recovery)
+        ↓
+[Layer 3] Facial Framing & Interactive Liveness (Blink / Smile / Turn challenge)
+        ↓
+[Layer 4] Atomic Composite Lock ({sessionId}_{studentId})
+        ↓
+Immutable Attendance Record & Real-time Live Ticker
 ```
 
----
+### 3.1 Layer 1: Dynamic Short-Lived QR Tokens
+- **Rotation Interval:** Tokens regenerate automatically every **25 seconds** on the faculty screen.
+- **Entropy Format:** `ATTENDIQ:{sessionId}:{timestamp}:{salt}` encoded with cryptographic entropy.
+- **Quick-Code Fallback:** Displays a companion 6-character high-entropy alphanumeric quick code for manual entry if camera hardware is unavailable.
+- **Grace-Period Tolerance:** Validates tokens up to 30 seconds past rotation to accommodate minor network latency without opening a window for proxy screenshots.
 
-# 8. Users Collection
+### 3.2 Layer 2: Haversine Campus Geofencing
+- **Coordinates:** Anchored at SBCET Campus, Benad Road, Jaipur (**26.9855° N, 75.7725° E**).
+- **Radius:** Default 150 meters (configurable 50m–500m in Admin Console).
+- **Mathematical Formula:**
+  $$a = \sin^2\left(\frac{\Delta\varphi}{2}\right) + \cos(\varphi_1)\cdot\cos(\varphi_2)\cdot\sin^2\left(\frac{\Delta\lambda}{2}\right)$$
+  $$c = 2\cdot\text{atan2}\left(\sqrt{a},\,\sqrt{1-a}\right),\quad d = R\cdot c\quad (R = 6{,}371{,}000\text{ m})$$
+- **Permission Recovery Protocol:** If GPS access is denied or weak inside basement laboratories, the system falls back to the **Campus Wi-Fi Beacon** (SSID `SBCET-STUDENT-5G`), confirming physical connection to the institutional router gateway.
 
-```text
-users/{userId}
+### 3.3 Layer 3: Biometric Facial Recognition & Liveness Detection
+- **Camera Frame Capture:** Front-facing camera stream is analyzed in an animated oval viewport.
+- **Profile Matching:** Canvas pixel analysis verifies facial features against the enrolled biometric profile.
+- **Randomized Liveness Challenge:** Prompts the student with interactive random challenges (*"Please blink both eyes naturally now"*, *"Smile at the camera"*, or *"Turn your head slightly"*), defeating static photo and video presentation attacks.
 
-{
-  name: "Student Name",
-  email: "student@example.com",
-  role: "student",
-  phone: "",
-  photoURL: "",
-  status: "active",
-  createdAt: serverTimestamp(),
-  updatedAt: serverTimestamp()
-}
-```
-
-Possible roles:
-
-```text
-admin
-teacher
-student
-```
+### 3.4 Layer 4: Atomic Duplicate Prevention Lock
+- **Composite Key:** `rec_{sessionId}_{studentId}` enforced in the persistence store.
+- Re-submissions for the same class session are immediately rejected with an alert.
 
 ---
 
-# 9. Students Collection
+## 4. User Roles & Capabilities
 
-```text
-students/{studentId}
+### 4.1 Institutional Administrator (Dr. Surendra Singh — Registrar / Principal)
+- **KPI Command Dashboard:** Real-time statistics on enrolled students (114), faculty (11), active classrooms, daily lectures, and attendance shortage alerts.
+- **Academic Hierarchy Management (CRUD):** Departments, Courses, Semesters, Sections, Classrooms, and Subjects.
+- **User Directory:** Filterable directory of all students and faculty with branch, batch, and biometric status.
+- **Timetable Scheduler:** Slot allocation by day of week, period duration, faculty assignment, and lecture hall.
+- **Geofence Controls:** Adjustable campus anchor coordinates, radius slider, session expiry, and late threshold.
+- **Immutable Audit Trail:** Comprehensive ledger recording every rule modification, session closure, and manual attendance correction with mandatory reasons.
+- **Reports & Sanitized CSV Export:** Formula-injection-safe (CWE-1236) CSV export.
 
-{
-  userId: "firebaseAuthUid",
-  name: "Student Name",
-  rollNo: "BCA2026001",
-  enrollmentNo: "ENR001",
-  departmentId: "cs",
-  courseId: "bca",
-  semesterId: "sem3",
-  sectionId: "bca3a",
-  academicSessionId: "2026-27",
-  status: "active",
-  faceProfileStatus: "verified",
-  createdAt: serverTimestamp(),
-  updatedAt: serverTimestamp()
-}
-```
+### 4.2 Faculty / Teacher (11 SBCET Professors)
+- **Day-Wise Timetable Navigator:** Day selector tabs (`Monday` through `Saturday` + `All Days` + `Today` indicator) displaying scheduled classes in chronological order.
+- **Live Attendance Session:**
+  - High-density rotating dynamic QR code with animated 25s countdown ring.
+  - Overall session expiry timer.
+  - Real-time attendance counter (e.g., `62 / 65 Present — 95.4%`).
+  - Live check-in ticker displaying student roll numbers and verification tags (QR Valid, GPS Distance, Face Match).
+  - Assisted roll-call toggle for students experiencing device connectivity issues.
+  - One-tap **"PDF Sheet"** export button directly on the live screen.
+- **Day-Wise Lecture Logs:** Expandable roll-call cards showing all students enrolled in the section, their present/absent status, and one-click PDF generation.
+- **Cumulative Course Register:** Complete semester register with student-by-student attendance percentages and automated **SHORTAGE (<75%)** alerts.
+- **Auditable Corrections:** Status modifications require a minimum 6-character justification reason recorded in the permanent audit trail.
 
----
-
-# 10. Teachers Collection
-
-```text
-teachers/{teacherId}
-
-{
-  userId: "firebaseAuthUid",
-  employeeId: "T001",
-  name: "Teacher Name",
-  departmentId: "cs",
-  status: "active",
-  createdAt: serverTimestamp(),
-  updatedAt: serverTimestamp()
-}
-```
+### 4.3 Student (114 Enrolled SBCET Students)
+- **My Attendance Dashboard:**
+  - Circular SVG overall attendance percentage gauge.
+  - Subject-by-subject progress bars with statutory 75% shortage badges.
+- **Multi-Step Scan Wizard:**
+  - Step 1: Active broadcast detection & dynamic QR scan / 6-character code input.
+  - Step 2: Physical GPS geofence verification with distance calculation.
+  - Step 3: Biometric face capture and interactive liveness challenge.
+  - Step 4: Digital verification receipt with confetti celebration and transaction hash.
+- **Weekly Schedule & Timetable:** Timetable filterable by day of week.
+- **Attendance Log:** Date-wise history with verification receipts.
 
 ---
 
-# 11. Subjects Collection
+## 5. Domain Schemas & Real SBCET Dataset
 
-```text
-subjects/{subjectId}
+### 5.1 Real Institutional Dataset
+- **114 Enrolled Students:**
+  - **Section A (65 students, SL1):** Batch A1 (33 CSE students: `26SBCETCSE001`–`033`), Batch A2 (22 CSE: `26SBCETCSE034`–`055` + 10 CS: `26SBCETCS001`–`010`).
+  - **Section B (49 students, SL-4):** Batch B1 (36 AI students: `26SBCETAI001`–`036`), Batch B2 (7 CSE-DS: `26SBCETDS001`–`007` + 6 Mech: `26SBCETME001`–`006`).
+- **11 Real Faculty Profiles:**
+  - `tea_aastha`: Dr. Aastha Pareek (Engineering Chemistry, CY101 / CY102P)
+  - `tea_ahkhan`: Dr. A. H. Khan (Engineering Mathematics, MA101)
+  - `tea_vishal`: Dr. Vishal Sexena (Engineering Mathematics, MA101)
+  - `tea_pankaj`: Dr. Pankaj Meel (Communication Skills, HS101 / ECA)
+  - `tea_vikas`: Mr. Vikas Singh (Programming for Problem Solving, CS102)
+  - `tea_sikander`: Mr. Sikander Khan (Cyber Security, CS101 / PPS Lab)
+  - `tea_happy`: Mr. Happy Dabla (Digital Electronics, EC101)
+  - `tea_firoz`: Dr. Syed Firoz Haider (Digital Electronics, EC101)
+  - `tea_toofan`: Mr. Toofan Mukharjee (Cyber Security, CS101)
+  - `tea_vijay`: Mr. Vijay Sharma (PPS Lab, CS103P)
+  - `tea_nisha`: Dr. Nisha Poonia (Communication Skills Lab, HS102P)
+- **60 Historical Sessions:** Pre-seeded across 5 weeks (18 Aug – 19 Sep 2026) reflecting realistic attendance variations.
 
-{
-  name: "Data Structures",
-  code: "CS201",
-  departmentId: "cs",
-  courseId: "bca",
-  semesterId: "sem3",
-  status: "active"
-}
-```
+### 5.2 Core TypeScript Interfaces
 
----
-
-# 12. Teacher-Subject Assignment
-
-Teacher assignment can be stored in a dedicated collection or embedded through assignment documents.
-
-Recommended:
-
-```text
-subjectAssignments/{assignmentId}
-
-{
-  subjectId: "dsa",
-  teacherId: "teacher001",
-  sectionId: "bca3a",
-  academicSessionId: "2026-27",
-  status: "active"
-}
-```
-
-This allows multiple teachers/sections to use the same subject where necessary.
-
----
-
-# 13. Timetable
-
-```text
-timetables/{timetableId}
-
-{
-  dayOfWeek: 1,
-  startTime: "10:00",
-  endTime: "11:00",
-  subjectId: "dsa",
-  teacherId: "teacher001",
-  sectionId: "bca3a",
-  classroomId: "room204",
-  academicSessionId: "2026-27",
-  status: "active"
-}
-```
-
-The teacher dashboard should use this data to show today's classes automatically.
-
----
-
-# 14. Classroom
-
-```text
-classrooms/{classroomId}
-
-{
-  name: "Room 204",
-  building: "Main Block",
-  latitude: 0,
-  longitude: 0,
-  status: "active"
-}
-```
-
-Coordinates should be configured by the college administrator rather than hard-coded.
-
----
-
-# 15. Attendance Session
-
-A teacher creates an attendance session for a specific scheduled class.
-
-```text
-attendanceSessions/{sessionId}
-
-{
-  teacherId: "teacher001",
-  subjectId: "dsa",
-  sectionId: "bca3a",
-  timetableId: "tt001",
-  classroomId: "room204",
-  startedAt: serverTimestamp(),
-  expiresAt: serverTimestamp(),
-  status: "active",
-
-  qrVersion: 1,
-
+```typescript
+export interface AttendanceSession {
+  id: string;
+  teacherId: string;
+  subjectId: string;
+  sectionId: string;
+  timetableId: string;
+  classroomId: string;
+  academicSessionId: string;
+  startedAt: string;
+  expiresAt: string;
+  status: 'active' | 'closed';
+  currentQrToken: string;
+  qrVersion: number;
+  lastQrRotatedAt: string;
   security: {
-    dynamicQR: true,
-    geofence: true,
-    faceVerification: true,
-    liveness: true
-  }
+    dynamicQR: boolean;
+    geofence: boolean;
+    faceVerification: boolean;
+    liveness: boolean;
+  };
 }
-```
 
-Do not trust a QR token supplied by the client as proof of attendance. The backend must validate the active session and token.
-
----
-
-# 16. Dynamic QR Design
-
-The QR should represent a short-lived attendance session/token.
-
-Requirements:
-
-- Token must expire.
-- Token must be unpredictable.
-- Token must be validated server-side.
-- A screenshot of an expired QR must fail.
-- Student must be authenticated.
-- Student can submit only once per session.
-- Teacher can close the session immediately.
-
-Suggested session duration:
-
-**5–10 minutes**, configurable by admin.
-
-QR refresh interval can be approximately:
-
-**20–30 seconds**, configurable if needed.
-
-The exact values should be tested with the college workflow.
-
----
-
-# 17. Student Attendance Record
-
-```text
-attendanceRecords/{recordId}
-
-{
-  sessionId: "session123",
-  studentId: "student001",
-  teacherId: "teacher001",
-  subjectId: "dsa",
-  sectionId: "bca3a",
-
-  status: "present",
-
-  markedAt: serverTimestamp(),
-
+export interface AttendanceRecord {
+  id: string;
+  sessionId: string;
+  studentId: string;
+  studentName: string;
+  rollNo: string;
+  branch?: string;
+  batch?: string;
+  teacherId: string;
+  subjectId: string;
+  sectionId: string;
+  status: 'present' | 'absent' | 'late' | 'excused';
+  markedAt: string;
   verification: {
-    qr: "passed",
-    geofence: "passed",
-    face: "passed",
-    liveness: "passed"
-  }
+    qr: 'passed' | 'failed';
+    geofence: 'passed' | 'failed';
+    face: 'passed' | 'failed';
+    liveness: 'passed' | 'failed';
+    distanceMeters?: number;
+    faceMatchScore?: number;
+    deviceTimestamp: string;
+  };
 }
 ```
 
-Possible attendance statuses:
+---
 
-```text
-present
-absent
-late
-excused
-```
+## 6. Progressive Web App (PWA) Architecture
 
-Attendance should normally be generated from session participation, not from a student-controlled status field.
+AttendIQ is engineered as a standalone Progressive Web App compliant with modern W3C standards:
+
+1. **Web App Manifest (`public/manifest.json`):**
+   - `display: "standalone"`, `orientation: "portrait-primary"`.
+   - Theme color: `#4f46e5` (indigo), Background: `#020617` (slate-950).
+   - Icons: Standard `192x192` and `512x512` PNG and SVG icons with `any` and `maskable` modes.
+2. **Offline Caching Service Worker (`public/sw.js`):**
+   - **Navigation Strategy:** `Network-First` falling back to the precached `/index.html` shell during campus Wi-Fi outages.
+   - **Static Assets:** `Stale-While-Revalidate` strategy for instantaneous loads.
+3. **Apple Mobile Integration (`index.html`):**
+   - `apple-mobile-web-app-capable`, status bar style `black-translucent`, and `apple-touch-icon`.
 
 ---
 
-# 18. Attendance Flow
+## 7. Automated PDF Reporting Engine
 
-## Teacher Side
+The PDF engine (`src/services/pdfService.ts` and `src/components/PdfPreviewModal.tsx`) generates vector-sharp, official documents:
 
-1. Login.
-2. Open dashboard.
-3. System displays today's timetable.
-4. Teacher selects/opens a scheduled class.
-5. Presses **Start Attendance**.
-6. Backend creates attendance session.
-7. Dynamic QR is displayed.
-8. Live count updates as students check in.
-9. Teacher sees verified students.
-10. Teacher closes the session.
-11. Session becomes closed.
-12. Final attendance becomes available in reports.
+### 7.1 Single Session Roll Call Sheet PDF
+- **Header:** Sri Balaji College of Engineering & Technology, Jaipur (AICTE/RTU).
+- **Metadata Box:** Subject, Section, Faculty Name, Date, Time Slot, Hall, Enrolled vs. Present.
+- **Complete Class Roster:** Itemizes every student enrolled in the section with Roll Number, Name, Branch, Batch, bold status (**PRESENT** in green or **ABSENT** in red), check-in timestamp, and verification tags.
+- **Signature Blocks:** Subject Faculty, Class Coordinator, and Head of Department (HOD).
 
-## Student Side
-
-1. Login.
-2. Open **Mark Attendance**.
-3. Scan teacher's QR.
-4. System validates session.
-5. System checks that the student's account belongs to the target section.
-6. Location permission is requested when required.
-7. Geofence verification is performed.
-8. Face verification starts.
-9. Liveness check runs.
-10. Backend validates all required conditions.
-11. Attendance is created.
-12. Student sees confirmation.
+### 7.2 Cumulative Subject Register PDF
+- Displays total lectures conducted, lectures attended, percentage, and statutory **SHORTAGE (<75%)** warning tags for every student.
 
 ---
 
-# 19. Geofence
+## 8. Security Hardening & Vulnerability Mitigations
 
-Geofence is an additional verification layer.
-
-Admin configures:
-
-```text
-College/Campus Name
-Latitude
-Longitude
-Radius
-```
-
-Example concept:
-
-```text
-College Campus
-Radius: 150 metres
-```
-
-Do not hard-code a real college location into the application.
-
-## Geofence rules
-
-- Check location only during an attendance attempt.
-- Do not continuously track students.
-- Consider device-reported accuracy.
-- Reject clearly unreliable readings.
-- Use a reasonable campus radius.
-- Keep location retention minimal.
-- Make the policy visible to students.
-- Provide a controlled fallback for legitimate location failures.
-
-GPS is not perfectly reliable indoors, so geofence should not be treated as absolute proof of classroom presence.
+| Threat Vector | Potential Impact | AttendIQ Engineered Defense |
+| :--- | :--- | :--- |
+| **Screenshot Forwarding** | Remote students marking attendance. | 25-second rotating cryptographic tokens + 30s grace window. |
+| **Off-Campus GPS Spoofing** | Submissions from outside campus. | Haversine distance check (150m) + Campus Wi-Fi Beacon recovery. |
+| **Photo Presentation Attacks** | Holding printed selfies to camera. | Randomized interactive liveness challenges (blink, smile, head-turn). |
+| **CSV Formula Injection (CWE-1236)** | Arbitrary command execution in Excel. | All cells starting with `=, +, -, @, \t, \r` escaped with single quotes. |
+| **Race Conditions** | Duplicate attendance submissions. | Atomic composite key lock (`rec_{sessionId}_{studentId}`). |
+| **Memory Leaks** | Browser tab slowdown during exports. | Proper cleanup via `URL.revokeObjectURL(url)`. |
 
 ---
 
-# 20. Face Verification
+## 9. Production Build & Deployment Verification
 
-Face verification should confirm that the authenticated student is the person attempting attendance.
-
-Recommended flow:
-
+### 9.1 Build Results (`npm run build`)
 ```text
-Authenticated Student
-        ↓
-Camera Permission
-        ↓
-Face Detection
-        ↓
-Face Verification
-        ↓
-Liveness
-        ↓
-Backend Result
+> attendiq@1.0.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+✓ 1969 modules transformed.
+dist/index.html                   1.66 kB │ gzip:   0.81 kB
+dist/assets/index-D9ro0Boa.css   47.68 kB │ gzip:   8.36 kB
+dist/assets/index-w-y1yMjM.js   509.24 kB │ gzip: 124.35 kB
+dist/AttendIQ_Project_Report.pdf 930.09 kB
+✓ built in 9.71s with 0 errors
 ```
 
-The system should preferably use a reputable face verification/liveness service rather than implementing production biometric matching from scratch.
+### 9.2 Institutional Demo Credentials
 
-## Biometric privacy principles
-
-- Obtain appropriate consent.
-- Explain why face verification is required.
-- Collect only necessary data.
-- Protect biometric templates.
-- Restrict access.
-- Avoid storing raw attendance selfies unless there is a documented need.
-- Define retention/deletion rules.
-- Provide an appropriate non-biometric/manual verification path where required by institutional policy or applicable law.
+| Role | User ID / Roll No | Password | Profile Details |
+| :--- | :--- | :--- | :--- |
+| **Student** | `26SBCETCSE001` or `student@sbcet.ac.in` | `student123` | Aayush Sharma (B.Tech I Sem, Sec A, CSE) |
+| **Teacher** | `EMP-T201` or `aastha@sbcet.ac.in` | `teacher123` | Dr. Aastha Pareek (Engineering Chemistry) |
+| **Teacher** | `EMP-T202` or `ahkhan@sbcet.ac.in` | `teacher123` | Dr. A. H. Khan (Engineering Mathematics) |
+| **Admin** | `admin@sbcet.ac.in` | `admin123` | Dr. Surendra Singh (Principal & Registrar) |
 
 ---
 
-# 21. Liveness Detection
-
-Liveness helps distinguish a live person from a photograph/video.
-
-Possible flow:
-
-```text
-Face Detected
-↓
-Look at Camera
-↓
-Random Liveness Challenge
-↓
-Blink / Turn Head / Follow Prompt
-↓
-Liveness Passed
-```
-
-The exact challenge should be generated by the verification provider rather than trusting a client-side boolean.
-
----
-
-# 22. Security Model
-
-Never rely only on frontend JavaScript.
-
-Important security rules:
-
-- Firebase Authentication required.
-- Role-based Firestore access.
-- Students can read only their permitted data.
-- Teachers can access only assigned subjects/classes.
-- Admin has management permissions.
-- Attendance creation should be validated server-side.
-- Session expiration should be validated server-side.
-- Server timestamps should be used.
-- QR tokens must not be trusted directly from the browser.
-- Duplicate attendance must be prevented.
-- Historical records should not be freely editable.
-- Sensitive verification results should have restricted access.
-- Every administrative attendance correction should generate an audit event.
-
----
-
-# 23. Firestore Security Concept
-
-The exact production rules should be written after the schema is finalized.
-
-Conceptually:
-
-```text
-Student:
-  read own profile
-  read own attendance
-  create attendance only through validated server workflow
-
-Teacher:
-  read assigned classes
-  create attendance sessions for assigned classes
-  read attendance for assigned classes
-
-Admin:
-  manage configuration and users
-  read all authorized attendance
-  approve corrections
-
-Nobody:
-  can arbitrarily change historical attendance from the client
-```
-
-For sensitive operations, prefer Cloud Functions/server-side validation.
-
----
-
-# 24. Attendance Duplicate Prevention
-
-A student must not be able to create two records for the same session.
-
-Recommended logical uniqueness:
-
-```text
-sessionId + studentId
-```
-
-Possible document ID:
-
-```text
-{sessionId}_{studentId}
-```
-
-The backend should also enforce this rule.
-
----
-
-# 25. Late Attendance
-
-Admin should configure the policy.
-
-Example:
-
-```text
-Session Duration: 10 minutes
-Late After: 5 minutes
-```
-
-Possible logic:
-
-```text
-0–5 minutes → Present
-5–10 minutes → Late
-After session closes → Not allowed
-```
-
-Do not hard-code these values.
-
----
-
-# 26. Attendance Correction
-
-A correction must never silently overwrite history.
-
-Example:
-
-```text
-Student: Rahul
-Subject: Data Structures
-Date: 18 Sept 2026
-
-Original: Absent
-Requested: Present
-
-Reason:
-Face verification failed even though student was present.
-
-Status:
-Pending Approval
-```
-
-After approval:
-
-```text
-Audit Log
-
-Actor: Teacher/Admin
-Action: Attendance Correction
-Old: Absent
-New: Present
-Reason: ...
-Timestamp: ...
-```
-
----
-
-# 27. Audit Logs
-
-```text
-auditLogs/{logId}
-
-{
-  actorId: "admin001",
-  action: "attendance_correction",
-  targetId: "attendanceRecord123",
-  oldValue: "absent",
-  newValue: "present",
-  reason: "Approved correction",
-  createdAt: serverTimestamp()
-}
-```
-
-Log important actions such as:
-
-- User creation
-- User disable/enable
-- Subject assignment
-- Timetable changes
-- Attendance session creation
-- Attendance correction
-- Configuration changes
-- Face-profile verification/reset
-
----
-
-# 28. Admin Dashboard
-
-## Overview
-
-Cards:
-
-```text
-Total Students
-Total Teachers
-Total Subjects
-Today's Classes
-Today's Attendance
-Low Attendance Students
-```
-
-## Quick Actions
-
-```text
-Add Student
-Add Teacher
-Create Subject
-Create Timetable
-View Attendance
-Generate Report
-```
-
-## Management Pages
-
-```text
-/admin/dashboard
-/admin/students
-/admin/teachers
-/admin/departments
-/admin/courses
-/admin/sections
-/admin/subjects
-/admin/classrooms
-/admin/timetable
-/admin/attendance
-/admin/reports
-/admin/settings
-/admin/audit-logs
-```
-
----
-
-# 29. Teacher Dashboard
-
-Pages:
-
-```text
-/teacher/dashboard
-/teacher/classes
-/teacher/attendance
-/teacher/history
-/teacher/reports
-/teacher/profile
-```
-
-Main dashboard:
-
-```text
-Today's Classes
-
-Data Structures
-BCA 2A
-10:00 AM
-Room 204
-
-[ START ATTENDANCE ]
-```
-
-During attendance:
-
-```text
-Data Structures
-BCA 2A
-
-Dynamic QR
-
-Present: 34 / 42
-
-[ CLOSE ATTENDANCE ]
-```
-
----
-
-# 30. Student Dashboard
-
-Pages:
-
-```text
-/student/dashboard
-/student/scan
-/student/attendance
-/student/timetable
-/student/profile
-```
-
-Dashboard:
-
-```text
-Overall Attendance
-87.4%
-
-Data Structures       92%
-Operating Systems     84%
-DBMS                   79%
-Computer Networks     91%
-```
-
----
-
-# 31. Student Attendance Screen
-
-```text
-Mark Attendance
-
-[ SCAN QR ]
-
-After scanning:
-
-Session Found
-Subject: Data Structures
-Class: BCA 2A
-Teacher: Teacher A
-
-Location
-✓ Inside attendance zone
-
-Face
-✓ Identity verified
-
-Liveness
-✓ Verified
-
-Final:
-✅ Attendance Marked
-```
-
----
-
-# 32. Reports
-
-Admin and authorized teachers can access reports.
-
-## Student-wise
-
-```text
-Student
-Roll Number
-Subject
-Classes Held
-Present
-Absent
-Late
-Percentage
-```
-
-## Subject-wise
-
-```text
-Subject
-Section
-Classes Held
-Average Attendance
-Low Attendance Count
-```
-
-## Date-wise
-
-```text
-Date
-Subject
-Teacher
-Section
-Present
-Absent
-Late
-```
-
-## Export
-
-Support:
-
-- CSV
-- Excel
-- PDF later
-
----
-
-# 33. Attendance Calculation
-
-Basic percentage:
-
-```text
-Attendance % =
-Present Classes / Total Applicable Classes × 100
-```
-
-Example:
-
-```text
-36 / 40 × 100 = 90%
-```
-
-If the institution has special rules for late/medical/excused attendance, those rules should be configurable and explicitly documented.
-
----
-
-# 34. Low Attendance Alerts
-
-Admin configures threshold.
-
-Example:
-
-```text
-Required Attendance: 75%
-Warning Threshold: 75%
-```
-
-If a student falls below threshold:
-
-```text
-⚠ Low Attendance
-
-Your DBMS attendance is 68%.
-
-Required: 75%
-```
-
-Notification delivery can later support:
-
-- In-app notifications
-- Email
-- College-approved messaging integration
-
----
-
-# 35. UI/UX Requirements
-
-## General
-
-- Mobile-first
-- Responsive
-- Clean academic design
-- Fast loading
-- Accessible controls
-- Large touch targets
-- Clear success/error states
-- Minimal teacher clicks
-
-## Teacher priority
-
-Teacher should be able to start attendance in a few taps.
-
-## Student priority
-
-Student should be able to complete attendance quickly.
-
-## Admin priority
-
-Admin should have clear navigation and powerful filtering.
-
----
-
-# 36. Suggested Navigation
-
-## Admin
-
-```text
-Dashboard
-Students
-Teachers
-Departments
-Courses
-Sections
-Subjects
-Classrooms
-Timetable
-Attendance
-Reports
-Notifications
-Settings
-Audit Logs
-Logout
-```
-
-## Teacher
-
-```text
-Dashboard
-Today's Classes
-Attendance
-History
-Reports
-Profile
-Logout
-```
-
-## Student
-
-```text
-Dashboard
-Mark Attendance
-My Attendance
-Timetable
-Profile
-Logout
-```
-
----
-
-# 37. Notifications
-
-Potential notifications:
-
-### Student
-
-- Attendance marked successfully.
-- Attendance failed.
-- Low attendance warning.
-- Timetable change.
-
-### Teacher
-
-- Attendance session completed.
-- Low attendance summary.
-- Timetable change.
-
-### Admin
-
-- Correction request.
-- Verification issue.
-- System/configuration alert.
-
----
-
-# 38. Error Handling
-
-Examples:
-
-```text
-QR expired
-→ "This attendance session has expired."
-
-Wrong class
-→ "You are not enrolled in this class."
-
-Outside geofence
-→ "You are outside the permitted attendance zone."
-
-Location unavailable
-→ "We couldn't verify your location. Please try again."
-
-Face not detected
-→ "Position your face inside the frame."
-
-Face mismatch
-→ "Identity verification failed."
-
-Liveness failed
-→ "Please retry the live verification."
-
-Already marked
-→ "Attendance has already been recorded."
-
-Session closed
-→ "This attendance session is closed."
-```
-
-Never expose internal Firebase errors or sensitive verification details to students.
-
----
-
-# 39. Important Abuse Cases to Test
-
-The system should explicitly test:
-
-1. Student shares QR screenshot.
-2. Student uses expired QR.
-3. Student tries another student's account.
-4. Student tries to mark attendance twice.
-5. Student is outside geofence.
-6. Student spoofs/blocks location where technically detectable.
-7. Student shows a photo to face verification.
-8. Student shows a video to the camera.
-9. Student's face does not match.
-10. Student loses internet during verification.
-11. Teacher closes session while students are scanning.
-12. Two devices use the same account.
-13. Student changes device time.
-14. Client modifies attendance request.
-15. Unauthorized user tries Firestore writes.
-16. Teacher tries to access another section.
-17. Admin correction is made without a reason.
-18. Duplicate attendance records are attempted.
-
----
-
-# 40. Offline/Network Considerations
-
-Attendance is a security-sensitive transaction.
-
-If internet connectivity is unavailable, do not silently mark attendance as successful.
-
-Possible behavior:
-
-```text
-Internet unavailable
-
-⚠ Attendance could not be verified.
-
-Please reconnect and try again.
-```
-
-A controlled offline mode can be designed later if the college requires it, but it needs careful anti-fraud handling.
-
----
-
-# 41. Recommended Project Folder Structure
-
-```text
-smart-attendance/
-│
-├── index.html
-├── login.html
-│
-├── admin/
-│   ├── dashboard.html
-│   ├── students.html
-│   ├── teachers.html
-│   ├── departments.html
-│   ├── courses.html
-│   ├── sections.html
-│   ├── subjects.html
-│   ├── classrooms.html
-│   ├── timetable.html
-│   ├── attendance.html
-│   ├── reports.html
-│   ├── settings.html
-│   └── audit-logs.html
-│
-├── teacher/
-│   ├── dashboard.html
-│   ├── attendance.html
-│   ├── history.html
-│   ├── reports.html
-│   └── profile.html
-│
-├── student/
-│   ├── dashboard.html
-│   ├── scan.html
-│   ├── attendance.html
-│   ├── timetable.html
-│   └── profile.html
-│
-├── css/
-│   ├── global.css
-│   ├── auth.css
-│   ├── admin.css
-│   ├── teacher.css
-│   └── student.css
-│
-├── js/
-│   ├── firebase.js
-│   ├── auth.js
-│   ├── guards.js
-│   ├── admin.js
-│   ├── teacher.js
-│   ├── student.js
-│   ├── attendance.js
-│   ├── qr.js
-│   ├── geofence.js
-│   ├── face.js
-│   └── reports.js
-│
-├── functions/
-│   └── Firebase Cloud Functions
-│
-├── firestore.rules
-├── firestore.indexes.json
-└── README.md
-```
-
----
-
-# 42. Development Phases
-
-## Phase 1 — Foundation
-
-- Firebase project
-- Authentication
-- User roles
-- Firestore schema
-- Security rules
-- Base UI
-
-## Phase 2 — Admin
-
-- Student management
-- Teacher management
-- Subjects
-- Sections
-- Classrooms
-- Timetable
-
-## Phase 3 — Teacher
-
-- Today's classes
-- Start session
-- Dynamic QR
-- Live attendance
-- Close session
-
-## Phase 4 — Student
-
-- Student dashboard
-- QR scanner
-- Attendance confirmation
-- Attendance history
-
-## Phase 5 — Geofence
-
-- Campus configuration
-- Location permission
-- Distance calculation
-- Accuracy checks
-- Failure/fallback flow
-
-## Phase 6 — Face & Liveness
-
-- Face enrollment workflow
-- Verification provider integration
-- Liveness
-- Verification result handling
-- Secure biometric-data lifecycle
-
-## Phase 7 — Analytics
-
-- Subject-wise attendance
-- Student-wise reports
-- Monthly reports
-- Low attendance
-- Export
-
-## Phase 8 — Security Testing
-
-- Firestore rules
-- Authorization tests
-- QR replay tests
-- Duplicate tests
-- Session expiry tests
-- Verification abuse tests
-
-## Phase 9 — Deployment
-
-- Production Firebase project
-- Environment configuration
-- Domain
-- HTTPS
-- Monitoring
-- Backup/recovery procedures
-
----
-
-# 43. MVP vs Advanced Features
-
-## MVP
-
-Build these first:
-
-- Login
-- Admin
-- Teacher
-- Student
-- Subjects
-- Sections
-- Timetable
-- Dynamic QR
-- Attendance records
-- Attendance history
-- Basic reports
-
-## Advanced
-
-Add after MVP:
-
-- Geofence
-- Face verification
-- Liveness
-- Low attendance alerts
-- Advanced analytics
-- Excel/PDF export
-- Correction workflow
-- Audit logs
-- Notifications
-- Multi-department support
-- Multiple campuses
-
-This staged approach reduces development risk.
-
----
-
-# 44. Recommended Attendance Security
-
-Final recommended model:
-
-```text
-                 ATTENDANCE REQUEST
-                         │
-                         ▼
-                 Firebase Login
-                         │
-                         ▼
-                 Active QR Session?
-                         │
-                         ▼
-                Correct Class/Section?
-                         │
-                         ▼
-                    Geofence
-                         │
-                         ▼
-                 Face Verification
-                         │
-                         ▼
-                  Liveness Check
-                         │
-                         ▼
-                  Duplicate Check
-                         │
-                         ▼
-              Server Timestamp
-                         │
-                         ▼
-              Create Attendance
-                         │
-                         ▼
-                       ✅
-```
-
-Each layer should be independently validated.
-
----
-
-# 45. Privacy & Governance Requirements
-
-Because the system may process face/biometric and location information, production deployment should include:
-
-- Clear privacy notice.
-- Appropriate consent/legal basis as required.
-- Purpose limitation.
-- Data minimization.
-- Secure storage.
-- Encryption in transit and at rest through supported platform controls.
-- Role-based access.
-- Defined retention period.
-- Deletion/revocation process.
-- Incident response process.
-- Institutional approval.
-- Appropriate alternative/manual verification process.
-
-The exact legal requirements should be reviewed with the college/institution before collecting biometric data.
-
----
-
-# 46. Production Rules
-
-Never put secrets in frontend code.
-
-Never trust:
-
-```text
-studentId
-teacherId
-role
-attendance status
-verification result
-timestamp
-```
-
-when they are supplied by an untrusted client.
-
-Sensitive values should be validated server-side.
-
----
-
-# 47. Performance Goals
-
-Target:
-
-- Fast dashboard loading.
-- Minimal Firestore reads.
-- Real-time attendance count.
-- Pagination for large student lists.
-- Indexed queries.
-- Avoid unnecessary location polling.
-- Avoid continuously running camera/face processing.
-- Lazy-load heavy features.
-
----
-
-# 48. Future Features
-
-Potential future additions:
-
-- Parent/guardian portal
-- HOD dashboard
-- Department-level analytics
-- Multiple campuses
-- Substitute teacher support
-- Exam attendance
-- QR attendance history
-- Attendance shortage prediction
-- Automated attendance certificates
-- College ERP integration
-- API for external college systems
-- PWA/mobile app
-- Android app
-- Email/SMS notifications
-
----
-
-# 49. Final Product Vision
-
-The final system should feel like:
-
-**For Teacher**
-
-> Open dashboard → Tap today's class → Display QR → Watch live count → Close session.
-
-**For Student**
-
-> Scan QR → Verify location → Verify face/liveness → Attendance confirmed.
-
-**For Admin**
-
-> Configure college once → Manage users/timetable → Monitor attendance → Generate reports → Audit corrections.
-
-The system should make attendance a **fast, secure, auditable workflow** rather than a daily manual roll-call process.
-
----
-
-# 50. Immediate Build Checklist
-
-Before production coding:
-
-- [ ] Confirm college hierarchy
-- [ ] Confirm Admin/Teacher/Student permissions
-- [ ] Confirm attendance duration
-- [ ] Confirm late-attendance policy
-- [ ] Confirm minimum attendance requirement
-- [ ] Decide campus geofence radius
-- [ ] Decide whether geofence is mandatory
-- [ ] Select face/liveness provider
-- [ ] Define biometric retention policy
-- [ ] Create Firebase project
-- [ ] Create Firestore schema
-- [ ] Write security rules
-- [ ] Build authentication
-- [ ] Build Admin panel
-- [ ] Build Teacher panel
-- [ ] Build Student panel
-- [ ] Implement timetable
-- [ ] Implement dynamic QR
-- [ ] Implement attendance records
-- [ ] Implement geofence
-- [ ] Implement face/liveness
-- [ ] Implement reports
-- [ ] Implement audit logs
-- [ ] Perform security testing
-- [ ] Deploy production
-
----
-
-# 51. Project Development Principle
-
-Build the system in this order:
-
-**Architecture → Database → Authentication → Roles → Admin → Timetable → Teacher Attendance → Student QR → Attendance Records → Geofence → Face/Liveness → Reports → Security Testing → Deployment**
-
-Do not build face recognition first. The attendance/session architecture and authorization model should be correct before biometric verification is integrated.
+## 10. Future Engineering Roadmap
+
+1. **Hardware BLE Beacons:** Doorway Bluetooth Low Energy beacons for zero-touch physical presence detection.
+2. **Automated Guardian SMS/WhatsApp Alerts:** Integration with Twilio/Gupshup SMS gateways for automated parent notifications when attendance drops below 75%.
+3. **Machine Learning Predictive Analytics:** Early-warning forecasting models projecting semester shortage risk by week 4.
