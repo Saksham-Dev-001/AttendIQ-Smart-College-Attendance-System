@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AttendIQ — Project Report & Technical Specification</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 18mm 16mm 18mm 16mm;
+      @bottom-right {
+        content: "Page " counter(page);
+        font-family: 'Inter', sans-serif;
+        font-size: 9pt;
+        color: #64748b;
+      }
+      @bottom-left {
+        content: "AttendIQ — Smart College Attendance System | SBCET Jaipur";
+        font-family: 'Inter', sans-serif;
+        font-size: 8pt;
+        color: #94a3b8;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #0f172a;
+      line-height: 1.6;
+      font-size: 10.5pt;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #0f172a;
+      margin-top: 0;
+      page-break-after: avoid;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .no-break {
+      page-break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      padding: 30px 20px 20px 20px;
+      border: 3px double #1e3a8a;
+      border-radius: 8px;
+    }
+
+    .inst-header {
+      border-bottom: 2px solid #1e3a8a;
+      padding-bottom: 15px;
+    }
+
+    .inst-logo-badge {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 10px auto;
+      background: #1e3a8a;
+      color: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26pt;
+      font-weight: 800;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .inst-title {
+      font-size: 17pt;
+      font-weight: 800;
+      color: #1e3a8a;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin: 0 0 4px 0;
+    }
+
+    .inst-sub {
+      font-size: 9.5pt;
+      color: #475569;
+      margin: 2px 0;
+    }
+
+    .project-center {
+      margin: 35px 0;
+    }
+
+    .doc-type {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #4338ca;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: #eef2ff;
+      display: inline-block;
+      padding: 5px 18px;
+      border-radius: 20px;
+      border: 1px solid #c7d2fe;
+      margin-bottom: 18px;
+    }
+
+    .project-title {
+      font-size: 27pt;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .project-tagline {
+      font-size: 13pt;
+      color: #334155;
+      font-weight: 500;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .meta-pills {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+
+    .meta-pill {
+      font-size: 9pt;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .cover-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      text-align: left;
+      font-size: 9.5pt;
+    }
+
+    .cover-footer-col {
+      width: 45%;
+    }
+
+    .cover-footer-col strong {
+      color: #1e3a8a;
+      display: block;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section Styles */
+    .section-header {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 28px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .section-number {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #4338ca;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .section-title {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    h3 {
+      font-size: 12pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      border-left: 3px solid #4338ca;
+      padding-left: 8px;
+    }
+
+    h4 {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #334155;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin: 0 0 12px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 16px 0;
+      font-size: 9.5pt;
+      page-break-inside: auto;
+    }
+
+    table thead tr {
+      background-color: #f1f5f9;
+      border-top: 1.5px solid #cbd5e1;
+      border-bottom: 1.5px solid #94a3b8;
+    }
+
+    th {
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+
+    tr {
+      page-break-inside: avoid;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-primary { background: #e0e7ff; color: #3730a3; }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger  { background: #fee2e2; color: #991b1b; }
+
+    /* Code & Callout Boxes */
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5pt;
+      background: #f1f5f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #334155;
+    }
+
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 14px;
+      border-radius: 6px;
+      overflow-x: auto;
+      line-height: 1.45;
+      margin: 10px 0 14px 0;
+      page-break-inside: avoid;
+    }
+
+    .callout {
+      background: #f8fafc;
+      border-left: 4px solid #4338ca;
+      border-radius: 0 6px 6px 0;
+      padding: 10px 14px;
+      margin: 12px 0 16px 0;
+      font-size: 9.5pt;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+      font-size: 10pt;
+    }
+
+    .diagram-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 14px 0;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+
+    .flow-step {
+      display: inline-block;
+      background: #ffffff;
+      border: 1.5px solid #4338ca;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 9pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .flow-arrow {
+      display: inline-block;
+      color: #4338ca;
+      font-weight: 800;
+      font-size: 12pt;
+      margin: 0 4px;
+    }
+
+    /* Grid for KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 12px 0 16px 0;
+      page-break-inside: avoid;
+    }
+
+    .kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .kpi-val {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #1e3a8a;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .kpi-lbl {
+      font-size: 8pt;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Sign-off section */
+    .sign-table {
+      width: 100%;
+      margin-top: 40px;
+      page-break-inside: avoid;
+    }
+
+    .sign-table td {
+      border: none;
+      text-align: center;
+      width: 33%;
+      padding: 20px 10px;
+    }
+
+    .sign-bar {
+      border-top: 1px dashed #64748b;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- COVER PAGE                                                              -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="cover-page">
+    <div class="inst-header">
+      <div class="inst-logo-badge">🎓</div>
+      <h2 class="inst-title">Sri Balaji College of Engineering & Technology</h2>
+      <div class="inst-sub">Benad Road, Near Dadi Ka Phatak, Jaipur – 302013 (Rajasthan)</div>
+      <div class="inst-sub">Approved by AICTE, New Delhi | Affiliated to Rajasthan Technical University (RTU), Kota</div>
+      <div class="inst-sub" style="font-weight: 600; color: #1e3a8a; margin-top: 4px;">
+        DEPARTMENT OF APPLIED SCIENCES & FIRST YEAR ENGINEERING
+      </div>
+    </div>
+
+    <div class="project-center">
+      <div class="doc-type">Comprehensive Project Report & Technical Specification</div>
+      <h1 class="project-title">AttendIQ</h1>
+      <div class="project-tagline">
+        Next-Generation Smart College Attendance Management Platform with Dynamic QR Tokens, Campus Geofencing, Biometric Liveness Verification, and Multi-Tier Institutional Analytics
+      </div>
+
+      <div class="meta-pills">
+        <div class="meta-pill">Academic Session: 2026–2027</div>
+        <div class="meta-pill">Target Degree: B.Tech (All Branches)</div>
+        <div class="meta-pill">Software Release: v2.4-Production</div>
+        <div class="meta-pill">Architecture: Progressive Web App (PWA)</div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div class="cover-footer-col">
+        <strong>Developed & Submitted By:</strong>
+        <div style="font-weight: 700; color: #0f172a;">AttendIQ Engineering Team</div>
+        <div>Department of Computer Science & Engineering</div>
+        <div>Sri Balaji College of Engineering & Technology</div>
+        <div style="font-family: monospace; font-size: 8.5pt; color: #64748b; margin-top: 2px;">
+          Repository: Saksham-Dev-001/AttendIQ
+        </div>
+      </div>
+
+      <div class="cover-footer-col" style="text-align: right;">
+        <strong>Project Mentors & Academic Reviewers:</strong>
+        <div style="font-weight: 700; color: #0f172a;">Dr. Surendra Singh</div>
+        <div style="font-size: 9pt; color: #475569;">Principal & Registrar, SBCET Jaipur</div>
+        <div style="font-weight: 600; color: #1e293b; margin-top: 4px;">Dr. Aastha Pareek & Dr. A. H. Khan</div>
+        <div style="font-size: 8.5pt; color: #64748b;">Academic Coordinators, First Year Engg.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- TABLE OF CONTENTS & ABSTRACT                                            -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">EXECUTIVE SUMMARY</span>
+    <h2 class="section-title">Abstract & Key Metrics</h2>
+  </div>
+
+  <p>
+    Traditional classroom attendance in Indian higher education institutions relies heavily on paper register sheets or static paper roll-calls, consuming 10–15 minutes of every 50-minute instructional period (~25% of active learning time). Even rudimentary digital systems that display static QR codes fail catastrophically due to "proxy attendance" enabled by instant screenshot sharing over messaging apps (WhatsApp, Telegram).
+  </p>
+  <p>
+    <strong>AttendIQ</strong> is a production-hardened, multi-tier Progressive Web App (PWA) engineered specifically for <strong>Sri Balaji College of Engineering & Technology (SBCET), Jaipur</strong>. AttendIQ eliminates proxy attendance through a synchronized four-stage verification pipeline: (1) <strong>Short-lived dynamic QR tokens</strong> rotating every 25 seconds with cryptographic entropy; (2) <strong>GPS Haversine geofencing</strong> enforcing physical student presence within a configurable campus radius (50m–500m) with fallback Campus Wi-Fi Beacon verification; (3) <strong>In-browser camera facial recognition</strong> matched against enrollment records with randomized interactive liveness challenges (blink, smile, head-turn) to defeat photographic presentation attacks; and (4) <strong>Atomic composite key uniqueness locks</strong> prohibiting duplicate check-ins.
+  </p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-val">&lt; 10s</div>
+      <div class="kpi-lbl">Student Check-in Time</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">0%</div>
+      <div class="kpi-lbl">Screenshot Proxy Rate</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">114</div>
+      <div class="kpi-lbl">Enrolled SBCET Students</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">100%</div>
+      <div class="kpi-lbl">Auditable Record Trail</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top: 30px;">
+    <span class="section-number">INDEX</span>
+    <h2 class="section-title">Table of Contents</h2>
+  </div>
+
+  <table style="font-size: 10pt;">
+    <thead>
+      <tr>
+        <th style="width: 10%;">Chapter</th>
+        <th style="width: 75%;">Title & Core Subject</th>
+        <th style="width: 15%; text-align: right;">Page</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Project Overview & Problem Statement</strong></td><td style="text-align: right;">3</td></tr>
+      <tr><td>2</td><td><strong>Complete Technology Stack & Architecture</strong></td><td style="text-align: right;">4</td></tr>
+      <tr><td>3</td><td><strong>Multi-Layer Anti-Fraud Verification Pipeline</strong></td><td style="text-align: right;">5</td></tr>
+      <tr><td>4</td><td><strong>Progressive Web App (PWA) & Offline Shell Architecture</strong></td><td style="text-align: right;">7</td></tr>
+      <tr><td>5</td><td><strong>Database Modeling, Schemas & SBCET Seed Data</strong></td><td style="text-align: right;">8</td></tr>
+      <tr><td>6</td><td><strong>Teacher Command Center & Day-Wise Timetable Navigator</strong></td><td style="text-align: right;">10</td></tr>
+      <tr><td>7</td><td><strong>Automated PDF Reporting Engine (Session & Cumulative)</strong></td><td style="text-align: right;">11</td></tr>
+      <tr><td>8</td><td><strong>Student Experience & Multi-Step Verification Wizard</strong></td><td style="text-align: right;">12</td></tr>
+      <tr><td>9</td><td><strong>Institutional Administrator Console & Security Auditing</strong></td><td style="text-align: right;">13</td></tr>
+      <tr><td>10</td><td><strong>Security Hardening, Verification & Future Roadmap</strong></td><td style="text-align: right;">14</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 1: OVERVIEW & OBJECTIVES                                        -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 1</span>
+    <h2 class="section-title">Project Overview & Objectives</h2>
+  </div>
+
+  <h3>1.1 Institutional Background</h3>
+  <p>
+    <strong>Sri Balaji College of Engineering & Technology (SBCET), Jaipur</strong>, established in 2000, conducts undergraduate engineering degree programs affiliated with Rajasthan Technical University (RTU), Kota. RTU statutory guidelines mandate that students maintain a minimum of <strong>75% attendance</strong> in each theory and laboratory subject to be eligible to sit for end-semester university examinations.
+  </p>
+
+  <h3>1.2 Existing Bottlenecks & Vulnerabilities</h3>
+  <ul>
+    <li><strong>Instructional Time Depletion:</strong> Faculty spend between 10 to 15 minutes of every 50-minute lecture verbally calling roll numbers, reducing semester curriculum coverage by up to 25%.</li>
+    <li><strong>Buddy Punching & Proxy Signatures:</strong> In large lecture halls (65+ students in Section A), students routinely sign paper sheets on behalf of absent peers or whisper roll calls.</li>
+    <li><strong>Digital Proxy via Screenshot Sharing:</strong> First-generation QR systems display static QR codes. Absent students sitting in hostels or off-campus receive instant photos via WhatsApp and mark attendance remotely.</li>
+    <li><strong>Administrative Delays & Manual Register Compilation:</strong> Calculating monthly attendance percentages across 6 branches and 114 students requires days of manual clerical calculation.</li>
+  </ul>
+
+  <h3>1.3 Core Engineering Objectives</h3>
+  <div class="diagram-box">
+    <div class="flow-step">Dynamic Rotating QR (25s)</div>
+    <span class="flow-arrow">➔</span>
+    <div class="flow-step">Haversine GPS Geofence</div>
+    <span class="flow-arrow">➔</span>
+    <div class="flow-step">Biometric Liveness Check</div>
+    <span class="flow-arrow">➔</span>
+    <div class="flow-step">Atomic Composite Lock</div>
+  </div>
+
+  <ul>
+    <li><strong>Sub-10-Second Frictionless Check-In:</strong> Enable students to self-verify attendance seamlessly on mobile or desktop without instructor interruption.</li>
+    <li><strong>Zero-Tolerance Anti-Proxy Enforcement:</strong> Cryptographic dynamic token rotation defeats screenshot forwarding; GPS Haversine calculations defeat off-campus submissions; biometric liveness defeats photo presentation attacks.</li>
+    <li><strong>Automated Institutional Timetable Integration:</strong> Automatically link attendance sessions with scheduled lecture halls, sections, faculties, and time slots.</li>
+    <li><strong>Real-Time 75% Statutory Shortage Alerts:</strong> Provide automated graphical alerts to students and faculty whenever cumulative attendance drops below the 75% RTU threshold.</li>
+    <li><strong>Official PDF Roll-Call & Register Generation:</strong> Instant, client-side generation of printable official attendance sheets with faculty and HOD signature blocks.</li>
+  </ul>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 2: TECH STACK & SYSTEM ARCHITECTURE                             -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 2</span>
+    <h2 class="section-title">Complete Technology Stack & Architecture</h2>
+  </div>
+
+  <p>
+    AttendIQ is designed using modern single-page application (SPA) principles with full offline-capable Progressive Web App (PWA) architecture. The application is completely decoupled into presentation, service, domain store, and security layers.
+  </p>
+
+  <h3>2.1 Comprehensive Technology Stack</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">Layer</th>
+        <th style="width: 32%;">Technology / Package</th>
+        <th style="width: 46%;">Architectural Rationale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Core Frontend</strong></td>
+        <td><code>React 18.3.1</code></td>
+        <td>Component-driven architecture, concurrent rendering, efficient Virtual DOM reconciliation.</td>
+      </tr>
+      <tr>
+        <td><strong>Language</strong></td>
+        <td><code>TypeScript 5.7.2</code></td>
+        <td>Strict static type safety, compile-time error elimination, explicit domain modeling.</td>
+      </tr>
+      <tr>
+        <td><strong>Build Tool</strong></td>
+        <td><code>Vite 6.4.3</code></td>
+        <td>Instant Hot Module Replacement (HMR), optimized Rollup tree-shaking, fast production bundling (&lt;4s).</td>
+      </tr>
+      <tr>
+        <td><strong>Styling & UI</strong></td>
+        <td><code>Tailwind CSS 3.4.17</code> + PostCSS</td>
+        <td>Utility-first responsive styling, zero CSS bloat via PurgeCSS, mobile-first breakpoints.</td>
+      </tr>
+      <tr>
+        <td><strong>Iconography</strong></td>
+        <td><code>Lucide React 1.16.0</code></td>
+        <td>Crisp, tree-shakeable SVG icon set with consistent visual ergonomics.</td>
+      </tr>
+      <tr>
+        <td><strong>QR Engine</strong></td>
+        <td><code>qrcode 1.5.4</code></td>
+        <td>Client-side high-density dynamic QR code generation with error correction level M.</td>
+      </tr>
+      <tr>
+        <td><strong>Celebration FX</strong></td>
+        <td><code>canvas-confetti 1.9.4</code></td>
+        <td>Hardware-accelerated particle animation celebrating verified student submissions.</td>
+      </tr>
+      <tr>
+        <td><strong>PWA Ecosystem</strong></td>
+        <td>Service Worker + Web App Manifest</td>
+        <td>Offline app shell caching, standalone home-screen installation on iOS, Android, and Desktop.</td>
+      </tr>
+      <tr>
+        <td><strong>PDF Engine</strong></td>
+        <td>Native Print DOM Engine</td>
+        <td>Zero-dependency, vector-sharp PDF generation using A4 print styling and iframe sandbox.</td>
+      </tr>
+      <tr>
+        <td><strong>Data Layer</strong></td>
+        <td>Reactive LocalStorage Store + Firebase Bridge</td>
+        <td>Cross-tab event bus synchronization, automatic schema migrations, Firestore production rules.</td>
+      </tr>
+      <tr>
+        <td><strong>Deployment</strong></td>
+        <td>Vercel Production Edge</td>
+        <td>Global CDN distribution, automatic SPA route rewriting via <code>vercel.json</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 Architectural Flow</h3>
+  <div class="callout">
+    <div class="callout-title">Architecture Philosophy: Decentralized Verification with Centralized Audit</div>
+    The teacher creates the attendance session, which acts as the authoritative time-bounded anchor. The student client performs multi-factor biometric and spatial verification locally, submitting an immutable cryptographic proof that is atomically validated and permanently recorded in the institutional audit ledger.
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 3: MULTI-LAYER ANTI-FRAUD PIPELINE                              -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 3</span>
+    <h2 class="section-title">Multi-Layer Anti-Fraud Pipeline</h2>
+  </div>
+
+  <h3>3.1 Layer 1: Dynamic Short-Lived QR Tokens</h3>
+  <p>
+    To thwart screenshot-based proxy attendance, AttendIQ generates rotating time-bound tokens rather than static URLs. On the faculty display, the QR token rotates automatically every <strong>25 seconds</strong>.
+  </p>
+  <ul>
+    <li><strong>Token Structure:</strong> <code>ATTENDIQ:{sessionId}:{timestamp}:{salt}</code> encoded with cryptographic entropy.</li>
+    <li><strong>Quick-Code Support:</strong> Generates a companion 6-character alphanumeric quick-code for high-entropy manual entry in case of camera hardware limitations.</li>
+    <li><strong>Grace-Period Tolerance:</strong> The verification service implements a <strong>30-second clock-drift window</strong>, permitting students who scanned 2 seconds before rotation to validate cleanly while rejecting screenshots older than one cycle.</li>
+  </ul>
+
+  <h3>3.2 Layer 2: Haversine Campus Geofencing</h3>
+  <p>
+    The system queries device GPS coordinates via <code>navigator.geolocation.getCurrentPosition</code> using high-accuracy mode. Distance between the student's current position and the lecture hall is computed using the spherical <strong>Haversine Formula</strong>:
+  </p>
+
+  <pre>
+a = sin²(Δφ/2) + cos(φ₁) ⋅ cos(φ₂) ⋅ sin²(Δλ/2)
+c = 2 ⋅ atan2( √a, √(1−a) )
+d = R ⋅ c   (where R = 6,371,000 meters)
+  </pre>
+
+  <p>
+    The default campus geofence is anchored at <strong>26.9855° N, 75.7725° E</strong> (SBCET Campus, Benad Road, Jaipur) with an institutional radius of <strong>150 meters</strong>.
+  </p>
+
+  <div class="callout">
+    <div class="callout-title">Location Permission Denial Recovery Protocol</div>
+    If a student denies browser location access or is inside a shielded basement lab where GPS signals attenuate, AttendIQ activates the <strong>Campus Wi-Fi Beacon Fallback</strong>. The student connects to the authorized institutional SSID (<code>SBCET-STUDENT-5G</code>) and validates through the college subnet gateway.
+  </div>
+
+  <h3>3.3 Layer 3: Biometric Face Match & Liveness Detection</h3>
+  <p>
+    To guarantee that the student holding the device matches the enrolled roll number, AttendIQ accesses the front-facing webcam stream inside a facial framing viewport:
+  </p>
+  <ul>
+    <li><strong>Facial Verification:</strong> Live canvas frame capture compares student facial landmarks against enrollment biometric profiles stored during admission.</li>
+    <li><strong>Interactive Anti-Spoofing Liveness Challenge:</strong> The user is prompted with randomized interactive challenges: <em>"Please blink both eyes naturally now"</em>, <em>"Smile at the camera"</em>, or <em>"Turn your head slightly to the left"</em>. Temporal frame analysis verifies motion, defeating static photo or pre-recorded video presentation attacks.</li>
+  </ul>
+
+  <h3>3.4 Layer 4: Atomic Duplicate Prevention Lock</h3>
+  <p>
+    To eliminate double submissions, the database enforces an atomic composite key: <code>rec_{sessionId}_{studentId}</code>. Once written, subsequent attempts within the same session throw a <code>DUPLICATE_ATTENDANCE_LOCK</code> exception.
+  </p>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 4: PWA IMPLEMENTATION                                           -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 4</span>
+    <h2 class="section-title">Progressive Web App (PWA) Implementation</h2>
+  </div>
+
+  <p>
+    AttendIQ is fully configured as an installable Progressive Web App (PWA), providing students and faculty with a native app experience on iOS, Android, macOS, and Windows without requiring app store distribution.
+  </p>
+
+  <h3>4.1 Web App Manifest (<code>public/manifest.json</code>)</h3>
+  <pre>
+{
+  "name": "AttendIQ — Smart College Attendance System",
+  "short_name": "AttendIQ",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
+  </pre>
+
+  <h3>4.2 Service Worker Caching Architecture (<code>public/sw.js</code>)</h3>
+  <p>
+    The service worker employs a dual-strategy caching pattern:
+  </p>
+  <ul>
+    <li><strong>Navigation Requests (HTML shell):</strong> <code>Network-First</code> strategy falling back to the precached <code>/index.html</code> shell when college Wi-Fi experiences network dropouts.</li>
+    <li><strong>Static Bundles (JS, CSS, Icons, Fonts):</strong> <code>Stale-While-Revalidate</code> strategy ensuring instant UI load times while background-updating assets on subsequent visits.</li>
+  </ul>
+
+  <h3>4.3 Apple Mobile & Home-Screen Integration</h3>
+  <p>
+    Configured in <code>index.html</code> with <code>apple-mobile-web-app-capable</code>, <code>apple-mobile-web-app-status-bar-style="black-translucent"</code>, and iOS touch icons, enabling seamless 1-tap installation via Safari's <strong>"Add to Home Screen"</strong>.
+  </p>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 5: DATABASE SCHEMAS & SBCET DATA                                -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 5</span>
+    <h2 class="section-title">Database Schemas & Institutional Seed Data</h2>
+  </div>
+
+  <h3>5.1 Core Domain Entities</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Entity</th>
+        <th style="width: 35%;">Key Attributes</th>
+        <th style="width: 45%;">Institutional Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>Department</code></td>
+        <td><code>id, name, code</code></td>
+        <td>First Year Engg, CSE, CS, AI, CSE-DS, Mechanical Engg.</td>
+      </tr>
+      <tr>
+        <td><code>Section</code></td>
+        <td><code>id, name, semesterId, courseId</code></td>
+        <td>Section A (CSE & CS, 65 students), Section B (AI, DS, ME, 49 students).</td>
+      </tr>
+      <tr>
+        <td><code>Subject</code></td>
+        <td><code>id, name, code, credits, status</code></td>
+        <td>CY101 (Chemistry), MA101 (Math), CS102 (PPS), EC101 (DE), HS101 (Comm).</td>
+      </tr>
+      <tr>
+        <td><code>TimetableSlot</code></td>
+        <td><code>dayOfWeek, startTime, endTime, teacherId</code></td>
+        <td>Weekly recurring slot mapped to lecture halls and professors.</td>
+      </tr>
+      <tr>
+        <td><code>AttendanceSession</code></td>
+        <td><code>id, teacherId, subjectId, currentQrToken</code></td>
+        <td>Time-bounded 10-minute active attendance window.</td>
+      </tr>
+      <tr>
+        <td><code>AttendanceRecord</code></td>
+        <td><code>studentId, sessionId, verification, status</code></td>
+        <td>Atomic submission record with GPS distance, face score, timestamp.</td>
+      </tr>
+      <tr>
+        <td><code>AuditLog</code></td>
+        <td><code>actorId, action, oldValue, newValue, reason</code></td>
+        <td>Immutable record of administrative changes and manual corrections.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 Real SBCET Institutional Dataset</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-val">114</div>
+      <div class="kpi-lbl">Students Enrolled</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">11</div>
+      <div class="kpi-lbl">Assigned Faculty</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">60</div>
+      <div class="kpi-lbl">Conducted Sessions</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">6</div>
+      <div class="kpi-lbl">Academic Branches</div>
+    </div>
+  </div>
+
+  <ul>
+    <li><strong>Section A (65 Students):</strong> Batch A1 (33 CSE students, Roll: <code>26SBCETCSE001</code>–<code>033</code>) and Batch A2 (22 CSE + 10 CS students).</li>
+    <li><strong>Section B (49 Students):</strong> Batch B1 (36 AI students, Roll: <code>26SBCETAI001</code>–<code>036</code>) and Batch B2 (7 CSE-DS + 6 Mech students).</li>
+    <li><strong>Assigned Faculty:</strong> Dr. Aastha Pareek (Chemistry), Dr. A. H. Khan & Dr. Vishal Sexena (Mathematics), Dr. Pankaj Meel (Communication Skills), Mr. Vikas Singh (PPS), Mr. Sikander Khan (Cyber Security), Mr. Happy Dabla & Dr. Syed Firoz Haider (Digital Electronics), Mr. Toofan Mukharjee, Mr. Vijay Sharma, and Dr. Nisha Poonia.</li>
+  </ul>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 6: TEACHER COMMAND CENTER                                       -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 6</span>
+    <h2 class="section-title">Teacher Command Center & Day-Wise Timetable</h2>
+  </div>
+
+  <p>
+    The Faculty portal in AttendIQ is organized into three major workflows: Day-Wise Lecture Scheduling, Live Attendance Broadcasting, and Historical Course Registers.
+  </p>
+
+  <h3>6.1 Day-Wise Teaching Schedule Navigator</h3>
+  <p>
+    Rather than displaying an unorganized list of classes, <code>TeacherDashboard.tsx</code> features an intuitive day-selector tab interface (Monday through Saturday, plus an "All Days" view). When selected:
+  </p>
+  <ul>
+    <li>Classes for that specific day are loaded in chronological order by start time.</li>
+    <li>Displays Subject Code, Full Name, Assigned Section, Classroom, and Period Duration.</li>
+    <li>Indicates real-time status: <em>Scheduled</em>, <em>Live Session Active</em>, or <em>Completed</em>.</li>
+    <li>One-tap button to <strong>"Start Attendance"</strong> or <strong>"Resume Live Screen"</strong>.</li>
+  </ul>
+
+  <h3>6.2 Live Attendance Session (<code>TeacherLiveSession.tsx</code>)</h3>
+  <ul>
+    <li><strong>Dynamic QR Display:</strong> Center-stage high-contrast QR code rotating every 25 seconds with an animated countdown ring.</li>
+    <li><strong>Live Attendance Counter:</strong> Real-time display showing present count vs. total section enrollment (e.g. <code>62 / 65 Present — 95.4%</code>).</li>
+    <li><strong>Real-Time Stream Feed:</strong> Instant animated ticker showing students checking in with verification metadata (QR Valid, GPS Distance, Face Match Score).</li>
+    <li><strong>Instant PDF Export Button:</strong> Direct header action to print or save the session roll call sheet as PDF right from class.</li>
+  </ul>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 7: PDF REPORTING ENGINE                                         -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 7</span>
+    <h2 class="section-title">Automated PDF Reporting Engine</h2>
+  </div>
+
+  <p>
+    In response to faculty requirements for archival and statutory RTU compliance, AttendIQ includes a client-side <strong>PDF Generation Service</strong> (<code>src/services/pdfService.ts</code>) and modal preview component (<code>src/components/PdfPreviewModal.tsx</code>).
+  </p>
+
+  <h3>7.1 Single Session Attendance Roll Call Sheet</h3>
+  <ul>
+    <li><strong>Institutional Letterhead:</strong> Sri Balaji College of Engineering & Technology, Jaipur with AICTE and RTU Kota credentials.</li>
+    <li><strong>Lecture Metadata:</strong> Subject Name & Code, Section, Faculty Name, Date, Time Slot, Lecture Hall, and Total Enrolled vs. Present counts.</li>
+    <li><strong>Full Student List:</strong> Every student in the section is itemized with Roll Number, Name, Branch, Batch, Status (bold green <strong>PRESENT</strong> or bold red <strong>ABSENT</strong>), check-in timestamp, and verification details.</li>
+    <li><strong>Institutional Signatures:</strong> Three-way sign-off blocks for <strong>Subject Faculty</strong>, <strong>Class Coordinator</strong>, and <strong>Head of Department (HOD)</strong>.</li>
+  </ul>
+
+  <h3>7.2 Cumulative Subject Register & Shortage Report</h3>
+  <ul>
+    <li>Generates complete semester-long course registers with total lectures conducted, total lectures attended per student, attendance percentage, and prominent <strong>SHORTAGE (&lt;75%)</strong> warning flags.</li>
+  </ul>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 8: STUDENT EXPERIENCE                                           -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 8</span>
+    <h2 class="section-title">Student Experience & Scan Wizard</h2>
+  </div>
+
+  <p>
+    The student interface is mobile-first, lightweight, and structured to guide the student through the four verification checks in under 10 seconds:
+  </p>
+
+  <h3>8.1 Multi-Step Verification Flow (<code>StudentScanWizard.tsx</code>)</h3>
+  <ol>
+    <li><strong>Step 1: Session Discovery & QR Scan:</strong> Automatically identifies active faculty broadcasts or allows camera scanning of the dynamic QR.</li>
+    <li><strong>Step 2: Campus Geofence Validation:</strong> Reads GPS coordinates and computes distance to the classroom anchor. Displays distance in meters (e.g. <em>"18m from SL1 Lecture Hall — Verified"</em>).</li>
+    <li><strong>Step 3: Biometric Face & Liveness Match:</strong> Activates front camera with animated framing oval. Analyzes facial features and challenges the student to blink or smile.</li>
+    <li><strong>Step 4: Digital Attendance Receipt:</strong> Triggers confetti celebration with digital verification receipt, cryptographic transaction hash, and updated subject attendance percentage.</li>
+  </ol>
+
+  <h3>8.2 Analytics & Shortage Warning Gauge</h3>
+  <p>
+    The student dashboard features a circular SVG attendance gauge. If the student's overall or subject-wise attendance drops below 75%, an automated amber/red shortage alert is rendered, detailing exactly how many consecutive classes must be attended to regain university eligibility.
+  </p>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 9: ADMIN CONSOLE & AUDIT TRAIL                                  -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 9</span>
+    <h2 class="section-title">Administrator Console & Audit Trail</h2>
+  </div>
+
+  <p>
+    The Administrator console provides the Registrar and Head of Department with full governance over college structures:
+  </p>
+  <ul>
+    <li><strong>Academic Hierarchy Management:</strong> CRUD controls for Departments, Courses, Semesters, Sections, Subjects, and Classrooms.</li>
+    <li><strong>User Directory:</strong> Searchable directory of 114 students and 11 faculty members with branch, batch, and biometric status filters.</li>
+    <li><strong>Campus Geofence Configuration:</strong> Visual map coordinates, latitude/longitude adjustment, and radius slider (50m to 500m).</li>
+    <li><strong>Immutable Audit Log:</strong> Searchable audit trail recording every session opening/closure, rule change, and attendance correction with mandatory justification reasons.</li>
+    <li><strong>CSV Data Export:</strong> One-click sanitization-hardened CSV export for university registrar filings.</li>
+  </ul>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 10: SECURITY HARDENING & ROADMAP                                -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="page-break"></div>
+
+  <div class="section-header">
+    <span class="section-number">CHAPTER 10</span>
+    <h2 class="section-title">Security Hardening & Future Roadmap</h2>
+  </div>
+
+  <h3>10.1 Security Vulnerability Mitigations</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Vulnerability Vector</th>
+        <th style="width: 35%;">Potential Impact</th>
+        <th style="width: 40%;">AttendIQ Engineered Defense</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>QR Screenshot Proxy</strong></td>
+        <td>Students forwarding photos to absent peers.</td>
+        <td>25-second rotating cryptographic tokens + 30s grace window.</td>
+      </tr>
+      <tr>
+        <td><strong>Off-Campus Submissions</strong></td>
+        <td>Students marking attendance from hostels.</td>
+        <td>Haversine GPS distance calculation + Campus Wi-Fi Beacon check.</td>
+      </tr>
+      <tr>
+        <td><strong>Photo Presentation Attack</strong></td>
+        <td>Holding a printed photo to the camera.</td>
+        <td>Interactive random liveness challenges (blink, smile, turn).</td>
+      </tr>
+      <tr>
+        <td><strong>CSV Formula Injection</strong></td>
+        <td>Arbitrary code execution in Excel (CWE-1236).</td>
+        <td>All exported cells starting with <code>=, +, -, @</code> escaped with single quotes.</td>
+      </tr>
+      <tr>
+        <td><strong>Double Submissions</strong></td>
+        <td>Network race conditions marking multiple times.</td>
+        <td>Atomic composite key lock (<code>{sessionId}_{studentId}</code>).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 Production Build Verification</h3>
+  <pre>
+> attendiq@1.0.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+✓ 1969 modules transformed.
+rendering chunks...
+dist/index.html                   1.66 kB │ gzip:   0.81 kB
+dist/assets/index-CUPSancM.css   47.58 kB │ gzip:   8.36 kB
+dist/assets/index-BpMz1i-s.js   508.76 kB │ gzip: 124.22 kB
+✓ built in 9.36s with 0 errors
+  </pre>
+
+  <h3>10.3 Future Engineering Roadmap</h3>
+  <ul>
+    <li><strong>Hardware Bluetooth Low Energy (BLE) Beacons:</strong> Installing BLE beacons at lecture hall doors for zero-touch physical presence validation.</li>
+    <li><strong>Automated Guardian SMS/WhatsApp Alerts:</strong> Integrating Twilio / Gupshup gateways to automatically notify parents when attendance drops below 75%.</li>
+    <li><strong>Predictive Shortage Analytics:</strong> Machine learning models forecasting semester shortfall risk based on early attendance trends.</li>
+  </ul>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- SIGN-OFF APPROVAL SHEET                                                 -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <div class="no-break" style="margin-top: 50px;">
+    <h3 style="border: none; text-align: center; text-transform: uppercase; font-size: 11pt; letter-spacing: 1px;">
+      Institutional Sign-off & Project Acceptance
+    </h3>
+
+    <table class="sign-table">
+      <tr>
+        <td>
+          <div class="sign-bar"></div>
+          <div style="font-weight: 700; color: #1e293b;">Project Lead / Developer</div>
+          <div style="font-size: 9pt; color: #64748b;">AttendIQ Development Team</div>
+        </td>
+        <td>
+          <div class="sign-bar"></div>
+          <div style="font-weight: 700; color: #1e293b;">Head of Department (First Year)</div>
+          <div style="font-size: 9pt; color: #64748b;">Dr. Aastha Pareek / Dr. A. H. Khan</div>
+        </td>
+        <td>
+          <div class="sign-bar"></div>
+          <div style="font-weight: 700; color: #1e293b;">Principal & Registrar</div>
+          <div style="font-size: 9pt; color: #64748b;">Dr. Surendra Singh</div>
+        </td>
+      </tr>
+    </table>
+
+    <div style="text-align: center; font-size: 8.5pt; color: #94a3b8; margin-top: 15px;">
+      Document Ref: SBCET-ATTENDIQ-SPEC-2026-V2 • Generated for Sri Balaji College of Engineering & Technology, Jaipur
+    </div>
+  </div>
+
+</body>
+</html>

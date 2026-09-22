@@ -29,6 +29,7 @@ import {
   INITIAL_TEACHERS,
   INITIAL_STUDENTS,
   INITIAL_TIMETABLE,
+  INITIAL_SESSIONS,
   INITIAL_ATTENDANCE_RECORDS,
   INITIAL_AUDIT_LOGS,
 } from './initialData';
@@ -67,18 +68,19 @@ class DatabaseStore {
     this.teachers = this.load('attendiq_teachers', INITIAL_TEACHERS);
     this.students = this.load('attendiq_students', INITIAL_STUDENTS);
     this.timetables = this.load('attendiq_timetables', INITIAL_TIMETABLE);
-    this.attendanceSessions = this.load('attendiq_attendance_sessions', []);
+    this.attendanceSessions = this.load('attendiq_attendance_sessions', INITIAL_SESSIONS);
     this.attendanceRecords = this.load('attendiq_attendance_records', INITIAL_ATTENDANCE_RECORDS);
     this.auditLogs = this.load('attendiq_audit_logs', INITIAL_AUDIT_LOGS);
 
-    // Auto-migrate if previous cache is outdated or doesn't have the full 114 SBCET students
-    const CURRENT_DATA_VERSION = '2026_sbcet_v4_production';
+    // Auto-migrate if previous cache is outdated or doesn't have the sessions or full students
+    const CURRENT_DATA_VERSION = '2026_sbcet_v5_teacher_daywise_pdf';
     const cachedVersion = localStorage.getItem('attendiq_data_version');
     if (
       cachedVersion !== CURRENT_DATA_VERSION ||
       !this.settings.collegeName.includes('Balaji') ||
       this.students.length < 114 ||
-      !this.students[0]?.batch
+      !this.students[0]?.batch ||
+      this.attendanceSessions.length === 0
     ) {
       this.resetToDefaults();
     }
@@ -482,7 +484,7 @@ class DatabaseStore {
     this.teachers = INITIAL_TEACHERS;
     this.students = INITIAL_STUDENTS;
     this.timetables = INITIAL_TIMETABLE;
-    this.attendanceSessions = [];
+    this.attendanceSessions = [...INITIAL_SESSIONS];
     this.attendanceRecords = INITIAL_ATTENDANCE_RECORDS;
     this.auditLogs = INITIAL_AUDIT_LOGS;
 
@@ -497,11 +499,11 @@ class DatabaseStore {
     this.save('attendiq_teachers', this.teachers);
     this.save('attendiq_students', this.students);
     this.save('attendiq_timetables', this.timetables);
-    this.save('attendiq_attendance_sessions', []);
+    this.save('attendiq_attendance_sessions', this.attendanceSessions);
     this.save('attendiq_attendance_records', this.attendanceRecords);
     this.save('attendiq_audit_logs', this.auditLogs);
     try {
-      localStorage.setItem('attendiq_data_version', '2026_sbcet_v4_production');
+      localStorage.setItem('attendiq_data_version', '2026_sbcet_v5_teacher_daywise_pdf');
     } catch {}
 
     this.notify();

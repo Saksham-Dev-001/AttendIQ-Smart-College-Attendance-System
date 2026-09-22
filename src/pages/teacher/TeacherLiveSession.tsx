@@ -18,7 +18,10 @@ import {
   Copy,
   Check,
   UserCheck,
+  FileText,
 } from 'lucide-react';
+import { getSessionPdfHtml, SessionPdfData } from '../../services/pdfService';
+import { PdfPreviewModal } from '../../components/PdfPreviewModal';
 
 interface TeacherLiveSessionProps {
   session: AttendanceSession;
@@ -38,6 +41,10 @@ export const TeacherLiveSession: React.FC<TeacherLiveSessionProps> = ({
   // Timers
   const [qrSecondsLeft, setQrSecondsLeft] = useState<number>(25);
   const [sessionSecondsLeft, setSessionSecondsLeft] = useState<number>(600);
+
+  // PDF Preview state
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [pdfHtml, setPdfHtml] = useState('');
 
   const settings = db.getSettings();
   const subject = db.getSubjects().find((s) => s.id === session.subjectId);
@@ -144,6 +151,61 @@ export const TeacherLiveSession: React.FC<TeacherLiveSessionProps> = ({
     });
   };
 
+  const handleExportLivePdf = () => {
+    const dateObj = new Date(session.startedAt);
+    const dateStr = dateObj.toLocaleDateString('en-IN', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+    const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const studentRows = students.map((st, idx) => {
+      const rec = records.find((r) => r.studentId === st.id);
+      return {
+        sNo: idx + 1,
+        rollNo: st.rollNo,
+        name: st.name,
+        branch: st.branch || 'CSE',
+        batch: st.batch || 'A1',
+        status: (rec?.status as any) || 'absent',
+        markedAt: rec ? new Date(rec.markedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
+        verificationSummary: rec
+          ? `QR: ${rec.verification.qr}, GPS: ${rec.verification.distanceMeters ?? 18}m, Face: ${rec.verification.face}`
+          : undefined,
+      };
+    });
+
+    const presentCount = records.length;
+    const totalEnrolled = students.length;
+    const absentCount = Math.max(0, totalEnrolled - presentCount);
+    const percentage = totalEnrolled > 0 ? parseFloat(((presentCount / totalEnrolled) * 100).toFixed(1)) : 0;
+
+    const pdfData: SessionPdfData = {
+      collegeName: settings.collegeName,
+      campusName: settings.campusName,
+      departmentName: 'Department of Applied Sciences & First Year Engineering',
+      subjectName: subject?.name || 'Subject',
+      subjectCode: subject?.code || 'SUB101',
+      facultyName: currentUser?.name || 'Faculty Member',
+      sectionName: section?.name || 'Section',
+      classroomName: classroom?.name || 'Lecture Hall',
+      dateStr,
+      timeStr,
+      academicSession: settings.academicSession,
+      totalEnrolled,
+      presentCount,
+      absentCount,
+      attendancePercentage: percentage,
+      students: studentRows,
+    };
+
+    const html = getSessionPdfHtml(pdfData);
+    setPdfHtml(html);
+    setPdfModalOpen(true);
+  };
+
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -183,6 +245,14 @@ export const TeacherLiveSession: React.FC<TeacherLiveSessionProps> = ({
               <span>{formatTime(sessionSecondsLeft)}</span>
             </div>
           </div>
+          <button
+            onClick={handleExportLivePdf}
+            className="px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5"
+            title="Download or Print live official Attendance Sheet (PDF)"
+          >
+            <FileText className="w-4 h-4" />
+            <span>PDF Sheet</span>
+          </button>
           <button
             onClick={handleCloseSession}
             className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md shadow-rose-600/20 transition-all flex items-center gap-1.5"
@@ -394,6 +464,14 @@ export const TeacherLiveSession: React.FC<TeacherLiveSessionProps> = ({
           </div>
         </div>
       </div>
+
+      {/* PDF Preview Modal */}
+      <PdfPreviewModal
+        isOpen={pdfModalOpen}
+        onClose={() => setPdfModalOpen(false)}
+        title={`Live Attendance Roll Call Sheet — ${subject?.code} (${section?.name})`}
+        htmlContent={pdfHtml}
+      />
     </div>
   );
 };

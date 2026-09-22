@@ -9,6 +9,7 @@ import {
   User,
   StudentProfile,
   TeacherProfile,
+  AttendanceSession,
   AttendanceRecord,
   AuditLog,
   SystemSettings,
@@ -753,6 +754,51 @@ const sessB = [
   {id:'sess_b_de_w5',   teacher:'tea_happy',    subject:'sub_de',    date:'2026-09-18T09:40', late:['stu_b1_02']},
   {id:'sess_b_cyber_w5',teacher:'tea_toofan',   subject:'sub_cyber', date:'2026-09-18T09:40'},
   {id:'sess_b_comm_w5', teacher:'tea_pankaj',   subject:'sub_comm',  date:'2026-09-19T13:50'},
+];
+
+export const INITIAL_SESSIONS: AttendanceSession[] = [
+  ...sessA.map((s) => ({
+    id: s.id,
+    teacherId: s.teacher,
+    subjectId: s.subject,
+    sectionId: 'sec_btech_1a',
+    timetableId: `tt_a_${s.id}`,
+    classroomId: 'cr_sl1',
+    academicSessionId: '2026-27',
+    startedAt: `${s.date}:00Z`,
+    expiresAt: `${s.date.replace(/:\d+$/, ':50')}:00Z`,
+    status: 'closed' as const,
+    currentQrToken: `EXP_${s.id}`,
+    qrVersion: 10,
+    lastQrRotatedAt: `${s.date}:00Z`,
+    security: {
+      dynamicQR: true,
+      geofence: true,
+      faceVerification: true,
+      liveness: true,
+    },
+  })),
+  ...sessB.map((s) => ({
+    id: s.id,
+    teacherId: s.teacher,
+    subjectId: s.subject,
+    sectionId: 'sec_btech_1b',
+    timetableId: `tt_b_${s.id}`,
+    classroomId: 'cr_sl4',
+    academicSessionId: '2026-27',
+    startedAt: `${s.date}:00Z`,
+    expiresAt: `${s.date.replace(/:\d+$/, ':50')}:00Z`,
+    status: 'closed' as const,
+    currentQrToken: `EXP_${s.id}`,
+    qrVersion: 10,
+    lastQrRotatedAt: `${s.date}:00Z`,
+    security: {
+      dynamicQR: true,
+      geofence: true,
+      faceVerification: true,
+      liveness: true,
+    },
+  })),
 ];
 
 export const INITIAL_ATTENDANCE_RECORDS: AttendanceRecord[] = [

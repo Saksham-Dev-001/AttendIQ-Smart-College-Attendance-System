@@ -8,6 +8,7 @@ import {
   LogOut,
   Clock,
   Building2,
+  FileText,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -86,6 +87,19 @@ export const Navbar: React.FC<NavbarProps> = () => {
               <Clock className="w-3.5 h-3.5 text-indigo-600" />
               <span>{time || '--:--:--'}</span>
             </div>
+
+            {/* Official Project Report PDF Download */}
+            <a
+              href="/AttendIQ_Project_Report.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              download="AttendIQ_Project_Report.pdf"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 shadow-2xs transition-all"
+              title="Download official comprehensive Project Report PDF"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Project Report (PDF)</span>
+            </a>
 
             {/* Authenticated User Details */}
             {currentUser && (
